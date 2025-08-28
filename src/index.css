@@ -1,0 +1,43 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+  }
+}
+
+@layer components {
+  .wordle-tile {
+    @apply w-12 h-12 border-2 border-gray-300 flex items-center justify-center text-2xl font-bold uppercase;
+  }
+  
+  .wordle-tile.correct {
+    @apply bg-green-500 border-green-500 text-white;
+  }
+  
+  .wordle-tile.present {
+    @apply bg-yellow-500 border-yellow-500 text-white;
+  }
+  
+  .wordle-tile.absent {
+    @apply bg-gray-500 border-gray-500 text-white;
+  }
+  
+  .keyboard-key {
+    @apply px-3 py-2 m-1 text-sm font-semibold text-gray-800 bg-gray-200 rounded-lg hover:bg-gray-300 transition-colors;
+  }
+  
+  .keyboard-key.correct {
+    @apply bg-green-500 text-white hover:bg-green-600;
+  }
+  
+  .keyboard-key.present {
+    @apply bg-yellow-500 text-white hover:bg-yellow-600;
+  }
+  
+  .keyboard-key.absent {
+    @apply bg-gray-500 text-white hover:bg-gray-600;
+  }
+}
