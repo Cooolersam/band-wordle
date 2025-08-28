@@ -166,6 +166,15 @@ const WordleBoard = ({ onGameComplete, onShowLeaderboard }) => {
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [guesses, currentGuessIndex])
 
+  // Handle grid click to focus input and show keyboard
+  const handleGridClick = () => {
+    // Focus the hidden input to bring up the keyboard
+    const hiddenInput = document.getElementById('hidden-input')
+    if (hiddenInput) {
+      hiddenInput.focus()
+    }
+  }
+
   // Render a single tile
   const renderTile = (letter, index, guessIndex) => {
     // Show uncolored tiles for future guesses and current input row
@@ -254,7 +263,7 @@ const WordleBoard = ({ onGameComplete, onShowLeaderboard }) => {
         {/* Mobile instructions */}
         <div className="sm:hidden text-center mb-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
           <p className="text-blue-800 text-sm">
-            <strong>Tap on the game board to start typing</strong>
+            <strong>Tap anywhere on the game board to start typing</strong>
           </p>
         </div>
         
@@ -268,8 +277,22 @@ const WordleBoard = ({ onGameComplete, onShowLeaderboard }) => {
           </div>
         )}
 
+        {/* Hidden input for mobile keyboard focus */}
+        <input
+          id="hidden-input"
+          type="text"
+          className="sr-only"
+          autoComplete="off"
+          autoCorrect="off"
+          autoCapitalize="off"
+          spellCheck="false"
+        />
+
         {/* Game Board */}
-        <div className="space-y-2 sm:space-y-3 mb-6 sm:mb-8">
+        <div 
+          className="space-y-2 sm:space-y-3 mb-6 sm:mb-8 sm:cursor-default cursor-pointer"
+          onClick={handleGridClick}
+        >
           {guesses.map((guess, guessIndex) => (
             <div key={guessIndex} className="flex justify-center space-x-1 sm:space-x-2">
               {Array.from({ length: WORD_LENGTH }, (_, index) => 
