@@ -7,6 +7,7 @@ const AdminPanel = ({ onBackToGame }) => {
   const [message, setMessage] = useState('')
   const [filterDate, setFilterDate] = useState('')
   const [filterNickname, setFilterNickname] = useState('')
+  const [activeTab, setActiveTab] = useState('scores')
 
   useEffect(() => {
     loadAllScores()
@@ -59,6 +60,69 @@ const AdminPanel = ({ onBackToGame }) => {
     return matchesDate && matchesNickname
   })
 
+  const renderWordSchedule = () => (
+    <div className="space-y-6">
+      <div className="bg-blue-50 border border-blue-200 rounded-xl p-6">
+        <h3 className="text-xl font-bold text-blue-800 mb-4">Word Schedule Information</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <h4 className="font-semibold text-blue-700 mb-2">Current Status</h4>
+            <ul className="space-y-1 text-sm text-blue-600">
+              <li>• Start Date: August 28, 2025</li>
+              <li>• Current Word List: 30 words</li>
+              <li>• List ends: After ANTHEM (September 27)</li>
+              <li>• Next words needed: Starting September 28</li>
+            </ul>
+          </div>
+          <div>
+            <h4 className="font-semibold text-blue-700 mb-2">Word Categories</h4>
+            <ul className="space-y-1 text-sm text-blue-600">
+              <li>• Instruments: GUITAR, GIBSON, PIANO</li>
+              <li>• Music Terms: RHYTHM, MELODY, BRIDGE</li>
+              <li>• Genres: REGGAE, TECHNO, COUNTRY</li>
+              <li>• Band Related: STAGE, STUDIO, ANTHEM</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div className="bg-amber-50 border border-amber-200 rounded-xl p-6">
+        <h4 className="font-semibold text-amber-800 mb-3">Quick Reference</h4>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+          <div>
+            <span className="font-medium text-amber-700">1st of month:</span><br/>
+            <span className="text-amber-600">Usually STAFFS, BALLET, or GIBSON</span>
+          </div>
+          <div>
+            <span className="font-medium text-amber-700">15th of month:</span><br/>
+            <span className="text-amber-600">Usually REGGAE, TECHNO, or COUNTRY</span>
+          </div>
+          <div>
+            <span className="font-medium text-amber-700">28th of month:</span><br/>
+            <span className="text-amber-600">Usually ANTHEM, BALLAD, or STUDIO</span>
+          </div>
+          <div>
+            <span className="font-medium text-amber-700">End of month:</span><br/>
+            <span className="text-amber-600">Usually GIBSON, GUITAR, or MUSIEL</span>
+          </div>
+        </div>
+      </div>
+
+      <div className="bg-green-50 border border-green-200 rounded-xl p-6">
+        <h4 className="font-semibold text-green-800 mb-3">Adding New Words</h4>
+        <p className="text-sm text-green-700 mb-3">
+          When you add new words to wordList.js, update this schedule accordingly.
+        </p>
+        <div className="text-xs text-green-600 space-y-1">
+          <p>• Words should be exactly 6 letters long</p>
+          <p>• All uppercase in the code</p>
+          <p>• Music/band related</p>
+          <p>• Update this admin panel when adding new words</p>
+        </div>
+      </div>
+    </div>
+  )
+
   return (
     <div className="min-h-screen p-6">
       <div className="max-w-6xl mx-auto p-8 bg-white rounded-2xl shadow-xl">
@@ -82,173 +146,140 @@ const AdminPanel = ({ onBackToGame }) => {
           </div>
         )}
 
-        {/* Filters */}
-        <div className="mb-6 p-4 bg-gray-50 rounded-xl">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Filter by Date
-              </label>
-              <input
-                type="date"
-                value={filterDate}
-                onChange={(e) => setFilterDate(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Filter by Nickname
-              </label>
-              <input
-                type="text"
-                value={filterNickname}
-                onChange={(e) => setFilterNickname(e.target.value)}
-                placeholder="Search nicknames..."
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
-              />
-            </div>
-          </div>
+        {/* Tab Navigation */}
+        <div className="flex border-b border-gray-200 mb-8">
+          <button
+            onClick={() => setActiveTab('scores')}
+            className={`tab-button ${activeTab === 'scores' ? 'active' : 'inactive'}`}
+          >
+            Scores Management
+          </button>
+          <button
+            onClick={() => setActiveTab('schedule')}
+            className={`tab-button ${activeTab === 'schedule' ? 'active' : 'inactive'}`}
+          >
+            Word Schedule
+          </button>
         </div>
 
-        {/* Scores Table */}
-        <div className="overflow-x-auto">
-          <table className="min-w-full bg-white border border-gray-200 rounded-xl overflow-hidden">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Date
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Nickname
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Section
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Guesses
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Solved
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-200">
-              {loading ? (
-                <tr>
-                  <td colSpan="6" className="px-6 py-12 text-center">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-red-500 mx-auto"></div>
-                    <p className="mt-2 text-gray-600">Loading scores...</p>
-                  </td>
-                </tr>
-              ) : filteredScores.length === 0 ? (
-                <tr>
-                  <td colSpan="6" className="px-6 py-12 text-center text-gray-500">
-                    No scores found
-                  </td>
-                </tr>
-              ) : (
-                filteredScores.map((score) => (
-                  <tr key={score.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {new Date(score.date).toLocaleDateString()}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                      {score.nickname}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {score.section}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                        score.solved 
-                          ? 'bg-green-100 text-green-800' 
-                          : 'bg-red-100 text-red-800'
-                      }`}>
-                        {score.guesses}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {score.solved ? '✅' : '❌'}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                      <button
-                        onClick={() => deleteScore(score.id)}
-                        className="text-red-600 hover:text-red-900 bg-red-50 hover:bg-red-100 px-3 py-1 rounded-lg transition-colors"
-                      >
-                        Delete
-                      </button>
-                    </td>
+        {/* Scores Tab */}
+        {activeTab === 'scores' && (
+          <>
+            {/* Filters */}
+            <div className="mb-6 p-4 bg-gray-50 rounded-xl">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Filter by Date
+                  </label>
+                  <input
+                    type="date"
+                    value={filterDate}
+                    onChange={(e) => setFilterDate(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Filter by Nickname
+                  </label>
+                  <input
+                    type="text"
+                    value={filterNickname}
+                    onChange={(e) => setFilterNickname(e.target.value)}
+                    placeholder="Search nicknames..."
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Scores Table */}
+            <div className="overflow-x-auto">
+              <table className="min-w-full bg-white border border-gray-200 rounded-xl overflow-hidden">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Date
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Nickname
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Section
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Guesses
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Solved
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Actions
+                    </th>
                   </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
-
-        <div className="mt-6 text-sm text-gray-500 text-center">
-          Total scores: {filteredScores.length} of {allScores.length}
-        </div>
-
-        {/* Word Schedule Section */}
-        <div className="mt-8 p-6 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-blue-200">
-          <h2 className="text-2xl font-bold mb-4 text-blue-800">Word Schedule</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <h3 className="text-lg font-semibold mb-3 text-blue-700">August 2025</h3>
-              <div className="space-y-1 text-sm">
-                <div>28 - MUSIEL</div>
-                <div>29 - GUITAR</div>
-                <div>30 - GIBSON</div>
-                <div>31 - BALLET</div>
-              </div>
+                </thead>
+                <tbody className="divide-y divide-gray-200">
+                  {loading ? (
+                    <tr>
+                      <td colSpan="6" className="px-6 py-12 text-center">
+                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-red-500 mx-auto"></div>
+                        <p className="mt-2 text-gray-600">Loading scores...</p>
+                      </td>
+                    </tr>
+                  ) : filteredScores.length === 0 ? (
+                    <tr>
+                      <td colSpan="6" className="px-6 py-12 text-center text-gray-500">
+                        No scores found
+                      </td>
+                    </tr>
+                  ) : (
+                    filteredScores.map((score) => (
+                      <tr key={score.id} className="hover:bg-gray-50">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          {new Date(score.date).toLocaleDateString()}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                          {score.nickname}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          {score.section}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                            score.solved 
+                              ? 'bg-green-100 text-green-800' 
+                              : 'bg-red-100 text-red-800'
+                          }`}>
+                            {score.guesses}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          {score.solved ? '✅' : '❌'}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                          <button
+                            onClick={() => deleteScore(score.id)}
+                            className="text-red-600 hover:text-red-900 bg-red-50 hover:bg-red-100 px-3 py-1 rounded-lg transition-colors"
+                          >
+                            Delete
+                          </button>
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
             </div>
-            <div>
-              <h3 className="text-lg font-semibold mb-3 text-blue-700">September 2025</h3>
-              <div className="space-y-1 text-sm">
-                <div>1 - STAFFS</div>
-                <div>2 - TREBLE</div>
-                <div>3 - CHORUS</div>
-                <div>4 - LEGATO</div>
-                <div>5 - RHYTHM</div>
-                <div>6 - MELODY</div>
-                <div>7 - BRIDGE</div>
-                <div>8 - ACCENT</div>
-                <div>9 - OCTAVE</div>
-                <div>10 - ENCORE</div>
-                <div>11 - PHRASE</div>
-                <div>12 - MANUAL</div>
-                <div>13 - FUSSEL</div>
-                <div>14 - REGGAE</div>
-                <div>15 - TECHNO</div>
-                <div>16 - COUNTRY</div>
-                <div>17 - OPERA</div>
-                <div>18 - BALLET</div>
-                <div>19 - CLASSICAL</div>
-                <div>20 - SONATA</div>
-                <div>21 - TUNING</div>
-                <div>22 - UNISON</div>
-                <div>23 - VOLUME</div>
-                <div>24 - DECAPO</div>
-                <div>25 - STUDIO</div>
-                <div>26 - BALLAD</div>
-                <div>27 - ANTHEM</div>
-                <div>28 - [Next word to be added]</div>
-                <div>29 - [Next word to be added]</div>
-                <div>30 - [Next word to be added]</div>
-              </div>
+
+            <div className="mt-6 text-sm text-gray-500 text-center">
+              Total scores: {filteredScores.length} of {allScores.length}
             </div>
-          </div>
-          <div className="mt-4 p-3 bg-blue-100 rounded-lg">
-            <p className="text-sm text-blue-800">
-              <strong>Note:</strong> This is NOT a cycling list. New words will be added over time. 
-              When you run out of ideas, you may loop back but in random order.
-            </p>
-          </div>
-        </div>
+          </>
+        )}
+
+        {/* Word Schedule Tab */}
+        {activeTab === 'schedule' && renderWordSchedule()}
       </div>
     </div>
   )
