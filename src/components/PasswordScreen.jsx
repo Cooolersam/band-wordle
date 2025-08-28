@@ -18,7 +18,7 @@ const PasswordScreen = ({ onPasswordCorrect, onCancel }) => {
     <div className="min-h-screen p-6 flex items-center justify-center">
       <div className="max-w-md w-full p-8 bg-white rounded-2xl shadow-xl">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-red-600 to-red-800 bg-clip-text text-transparent mb-2">
+          <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent mb-2">
             Admin Access
           </h1>
           <p className="text-gray-600">Enter password to continue</p>
@@ -47,12 +47,12 @@ const PasswordScreen = ({ onPasswordCorrect, onCancel }) => {
           )}
 
           <div className="flex space-x-3">
-            <button
-              type="submit"
-              className="flex-1 px-6 py-3 bg-red-600 text-white font-semibold rounded-xl hover:bg-red-700 transition-colors duration-200"
-            >
-              Access Admin
-            </button>
+                          <button
+                type="submit"
+                className="flex-1 px-6 py-3 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 transition-colors duration-200"
+              >
+                Access Admin
+              </button>
             <button
               type="button"
               onClick={onCancel}

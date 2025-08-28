@@ -256,7 +256,7 @@ const WordleBoard = ({ onGameComplete, onShowLeaderboard }) => {
   return (
     <div className="min-h-screen p-2 sm:p-6">
       <div className="game-container max-w-lg mx-auto p-4 sm:p-8">
-        <h1 className="text-3xl sm:text-4xl font-bold text-center mb-6 sm:mb-8 bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">
+        <h1 className="text-3xl sm:text-4xl font-bold text-center mb-6 sm:mb-8 bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent">
           Band Wordle
         </h1>
         

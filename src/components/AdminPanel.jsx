@@ -127,7 +127,7 @@ const AdminPanel = ({ onBackToGame }) => {
     <div className="min-h-screen p-6">
       <div className="max-w-6xl mx-auto p-8 bg-white rounded-2xl shadow-xl">
         <div className="flex justify-between items-center mb-8">
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-red-600 to-red-800 bg-clip-text text-transparent">
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent">
             Admin Panel
           </h1>
           <button
