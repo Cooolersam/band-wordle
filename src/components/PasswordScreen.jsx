@@ -18,7 +18,7 @@ const PasswordScreen = ({ onPasswordCorrect, onCancel }) => {
     <div className="min-h-screen p-6 flex items-center justify-center">
       <div className="max-w-md w-full p-8 bg-white rounded-2xl shadow-xl">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent mb-2">
+          <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-800 to-blue-900 bg-clip-text text-transparent mb-2">
             Admin Access
           </h1>
           <p className="text-gray-600">Enter password to continue</p>
