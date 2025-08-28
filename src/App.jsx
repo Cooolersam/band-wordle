@@ -1,10 +1,26 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import WordleBoard from './components/WordleBoard'
 import Leaderboard from './components/Leaderboard'
+import AdminPanel from './components/AdminPanel'
 
 function App() {
   const [currentView, setCurrentView] = useState('game')
   const [gameResult, setGameResult] = useState(null)
+  const [adminMode, setAdminMode] = useState(false)
+
+  // Hidden admin access: Press Ctrl+Shift+A to access admin panel
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.ctrlKey && e.shiftKey && e.key === 'A') {
+        e.preventDefault()
+        setAdminMode(true)
+        setCurrentView('admin')
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [])
 
   const handleGameComplete = (won, guesses) => {
     setGameResult({ won, guesses })
@@ -18,6 +34,7 @@ function App() {
   const handleBackToGame = () => {
     setCurrentView('game')
     setGameResult(null)
+    setAdminMode(false)
   }
 
   return (
@@ -27,12 +44,16 @@ function App() {
           onGameComplete={handleGameComplete}
           onShowLeaderboard={handleShowLeaderboard}
         />
-      ) : (
+      ) : currentView === 'leaderboard' ? (
         <Leaderboard 
           gameResult={gameResult}
           onBackToGame={handleBackToGame}
         />
-      )}
+      ) : currentView === 'admin' ? (
+        <AdminPanel 
+          onBackToGame={handleBackToGame}
+        />
+      ) : null}
     </div>
   )
 }
