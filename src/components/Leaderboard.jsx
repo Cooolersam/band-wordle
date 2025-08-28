@@ -10,12 +10,33 @@ const Leaderboard = ({ gameResult, onBackToGame }) => {
   const [formData, setFormData] = useState({ nickname: '', section: '' })
   const [message, setMessage] = useState('')
   const [activeTab, setActiveTab] = useState('daily')
+  const [hasSubmittedToday, setHasSubmittedToday] = useState(false)
 
   const { won, guesses } = gameResult || {}
 
   useEffect(() => {
     loadLeaderboards()
   }, [])
+
+  // Check submission status when gameResult changes
+  useEffect(() => {
+    if (gameResult && formData.nickname) {
+      checkSubmissionStatus()
+    }
+  }, [gameResult, formData.nickname])
+
+  const checkSubmissionStatus = async () => {
+    try {
+      const today = new Date().toISOString().split('T')[0]
+      const { hasSubmitted } = await dbOperations.hasSubmittedToday(
+        formData.nickname.trim(),
+        today
+      )
+      setHasSubmittedToday(hasSubmitted)
+    } catch (error) {
+      console.error('Error checking submission status:', error)
+    }
+  }
 
   const loadLeaderboards = async () => {
     setLoading(true)
@@ -36,6 +57,16 @@ const Leaderboard = ({ gameResult, onBackToGame }) => {
       } else {
         setMonthlyLeaderboard(monthlyResult.data || [])
       }
+
+      // Check if current user has already submitted today
+      if (gameResult && formData.nickname) {
+        const today = new Date().toISOString().split('T')[0]
+        const { hasSubmitted } = await dbOperations.hasSubmittedToday(
+          formData.nickname.trim(),
+          today
+        )
+        setHasSubmittedToday(hasSubmitted)
+      }
     } catch (error) {
       console.error('Error loading leaderboards:', error)
     } finally {
@@ -48,6 +79,13 @@ const Leaderboard = ({ gameResult, onBackToGame }) => {
     
     if (!formData.nickname.trim() || !formData.section.trim()) {
       setMessage('Please fill in both nickname and section')
+      return
+    }
+
+    // Additional safety check to prevent double submission
+    if (hasSubmittedToday) {
+      setMessage('You have already submitted a score today.')
+      setShowScoreForm(false)
       return
     }
 
@@ -89,6 +127,7 @@ const Leaderboard = ({ gameResult, onBackToGame }) => {
 
       setMessage('Score submitted successfully!')
       setShowScoreForm(false)
+      setHasSubmittedToday(true) // Prevent further submissions
       
       // Reload leaderboards
       setTimeout(() => {
@@ -110,23 +149,30 @@ const Leaderboard = ({ gameResult, onBackToGame }) => {
   }
 
   const renderDailyLeaderboard = () => (
-    <div className="space-y-2">
-      <h3 className="text-lg font-semibold text-center mb-4">Today's Best Scores</h3>
+    <div className="space-y-3">
+      <h3 className="text-xl font-bold text-center mb-6 text-gray-800">Today's Best Scores</h3>
       {dailyLeaderboard.length === 0 ? (
-        <p className="text-center text-gray-500">No scores yet today!</p>
+        <div className="text-center py-8">
+          <p className="text-gray-500 text-lg">No scores yet today!</p>
+          <p className="text-gray-400 text-sm mt-2">Be the first to play!</p>
+        </div>
       ) : (
         dailyLeaderboard.map((score, index) => (
-          <div key={score.id} className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-            <div className="flex items-center space-x-3">
-              <span className="text-lg font-bold text-gray-600">#{index + 1}</span>
-              <div>
-                <div className="font-semibold">{score.nickname}</div>
-                <div className="text-sm text-gray-600">{score.section}</div>
+          <div key={score.id} className="score-card">
+            <div className="flex justify-between items-center">
+              <div className="flex items-center space-x-4">
+                <span className={`rank-badge ${index === 0 ? 'gold' : index === 1 ? 'silver' : index === 2 ? 'bronze' : ''}`}>
+                  {index + 1}
+                </span>
+                <div>
+                  <div className="font-bold text-lg text-gray-800">{score.nickname}</div>
+                  <div className="text-sm text-gray-600">{score.section}</div>
+                </div>
               </div>
-            </div>
-            <div className="text-right">
-              <div className="font-bold text-green-600">{score.guesses}</div>
-              <div className="text-xs text-gray-500">guesses</div>
+              <div className="text-right">
+                <div className="font-bold text-2xl text-green-600">{score.guesses}</div>
+                <div className="text-xs text-gray-500 uppercase tracking-wide">guesses</div>
+              </div>
             </div>
           </div>
         ))
@@ -135,24 +181,31 @@ const Leaderboard = ({ gameResult, onBackToGame }) => {
   )
 
   const renderMonthlyLeaderboard = () => (
-    <div className="space-y-2">
-      <h3 className="text-lg font-semibold text-center mb-4">Monthly Rankings</h3>
+    <div className="space-y-3">
+      <h3 className="text-xl font-bold text-center mb-6 text-gray-800">Monthly Rankings</h3>
       {monthlyLeaderboard.length === 0 ? (
-        <p className="text-center text-gray-500">No monthly data yet!</p>
+        <div className="text-center py-8">
+          <p className="text-gray-500 text-lg">No monthly data yet!</p>
+          <p className="text-gray-400 text-sm mt-2">Play more games to see rankings!</p>
+        </div>
       ) : (
         monthlyLeaderboard.map((score, index) => (
-          <div key={index} className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-            <div className="flex items-center space-x-3">
-              <span className="text-lg font-bold text-gray-600">#{index + 1}</span>
-              <div>
-                <div className="font-semibold">{score.nickname}</div>
-                <div className="text-sm text-gray-600">{score.section}</div>
+          <div key={index} className="score-card">
+            <div className="flex justify-between items-center">
+              <div className="flex items-center space-x-4">
+                <span className={`rank-badge ${index === 0 ? 'gold' : index === 1 ? 'silver' : index === 2 ? 'bronze' : ''}`}>
+                  {index + 1}
+                </span>
+                <div>
+                  <div className="font-bold text-lg text-gray-800">{score.nickname}</div>
+                  <div className="text-sm text-gray-600">{score.section}</div>
+                </div>
               </div>
-            </div>
-            <div className="text-right">
-              <div className="font-bold text-blue-600">{score.totalGuesses}</div>
-              <div className="text-xs text-gray-500">
-                {score.gamesPlayed} {score.gamesPlayed === 1 ? 'game' : 'games'}
+              <div className="text-right">
+                <div className="font-bold text-2xl text-blue-600">{score.totalGuesses}</div>
+                <div className="text-xs text-gray-500 uppercase tracking-wide">
+                  {score.gamesPlayed} {score.gamesPlayed === 1 ? 'game' : 'games'}
+                </div>
               </div>
             </div>
           </div>
@@ -162,134 +215,143 @@ const Leaderboard = ({ gameResult, onBackToGame }) => {
   )
 
   return (
-    <div className="max-w-2xl mx-auto p-4">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold text-gray-800">Leaderboard</h1>
-        <button
-          onClick={onBackToGame}
-          className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
-        >
-          Back to Game
-        </button>
-      </div>
-
-      {/* Score Submission Form */}
-      {gameResult && !showScoreForm && (
-        <div className="mb-6 p-4 bg-blue-50 rounded-lg">
-          <h2 className="text-xl font-semibold mb-2">Submit Your Score</h2>
-          <p className="mb-3">
-            {won 
-              ? `Great job! You solved it in ${guesses} ${guesses === 1 ? 'guess' : 'guesses'}!`
-              : `You used ${guesses} guesses. Submit your score to compete!`
-            }
-          </p>
+    <div className="min-h-screen p-6">
+      <div className="leaderboard-container max-w-4xl mx-auto p-8">
+        <div className="flex justify-between items-center mb-8">
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">
+            🏆 Leaderboard
+          </h1>
           <button
-            onClick={() => setShowScoreForm(true)}
-            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+            onClick={onBackToGame}
+            className="btn-secondary"
           >
-            Submit Score
+            ← Back to Game
           </button>
         </div>
-      )}
 
-      {showScoreForm && (
-        <div className="mb-6 p-4 bg-blue-50 rounded-lg">
-          <h2 className="text-xl font-semibold mb-3">Enter Your Details</h2>
-          <form onSubmit={handleSubmitScore} className="space-y-3">
-            <div>
-              <label htmlFor="nickname" className="block text-sm font-medium text-gray-700 mb-1">
-                Nickname
-              </label>
-              <input
-                type="text"
-                id="nickname"
-                name="nickname"
-                value={formData.nickname}
-                onChange={handleInputChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Enter your nickname"
-                required
-              />
+        {/* Score Submission Form */}
+        {gameResult && !showScoreForm && !hasSubmittedToday && (
+          <div className="mb-8 p-6 bg-gradient-to-r from-amber-50 to-orange-50 rounded-2xl border border-amber-200">
+            <h2 className="text-2xl font-bold mb-3 text-gray-800">Submit Your Score</h2>
+            <p className="mb-4 text-gray-700">
+              {won 
+                ? `Great job! You solved it in ${guesses} ${guesses === 1 ? 'guess' : 'guesses'}!`
+                : `You used ${guesses} guesses. Submit your score to compete!`
+              }
+            </p>
+            <button
+              onClick={() => setShowScoreForm(true)}
+              className="btn-primary"
+            >
+              Submit Score
+            </button>
+          </div>
+        )}
+
+        {/* Already Submitted Message */}
+        {gameResult && hasSubmittedToday && (
+          <div className="mb-8 p-6 bg-gradient-to-r from-emerald-50 to-green-50 rounded-2xl border border-emerald-200">
+            <h2 className="text-2xl font-bold mb-3 text-gray-800">✅ Score Already Submitted</h2>
+            <p className="mb-4 text-gray-700">
+              You've already submitted your score for today. Come back tomorrow for another game!
+            </p>
+            <div className="text-sm text-emerald-600">
+              Your score: {guesses} {guesses === 1 ? 'guess' : 'guesses'} - {won ? 'Solved!' : 'Not solved'}
             </div>
-            <div>
-              <label htmlFor="section" className="block text-sm font-medium text-gray-700 mb-1">
-                Section
-              </label>
-              <input
-                type="text"
-                id="section"
-                name="section"
-                value={formData.section}
-                onChange={handleInputChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="e.g., Trumpet, Drums, Guitar"
-                required
-              />
-            </div>
-            {message && (
-              <div className={`p-2 rounded text-sm ${
-                message.includes('successfully') 
-                  ? 'bg-green-100 text-green-800' 
-                  : 'bg-red-100 text-red-800'
-              }`}>
-                {message}
+          </div>
+        )}
+
+        {showScoreForm && (
+          <div className="mb-8 p-6 bg-gradient-to-r from-amber-50 to-orange-50 rounded-2xl border border-amber-200">
+            <h2 className="text-2xl font-bold mb-4 text-gray-800">Enter Your Details</h2>
+            <form onSubmit={handleSubmitScore} className="space-y-4">
+              <div>
+                <label htmlFor="nickname" className="block text-sm font-medium text-gray-700 mb-2">
+                  Nickname
+                </label>
+                <input
+                  type="text"
+                  id="nickname"
+                  name="nickname"
+                  value={formData.nickname}
+                  onChange={handleInputChange}
+                  className="input-field"
+                  placeholder="Enter your nickname"
+                  required
+                />
               </div>
-            )}
-            <div className="flex space-x-2">
-              <button
-                type="submit"
-                disabled={submitting}
-                className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:opacity-50"
-              >
-                {submitting ? 'Submitting...' : 'Submit Score'}
-              </button>
-              <button
-                type="button"
-                onClick={() => setShowScoreForm(false)}
-                className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
-              >
-                Cancel
-              </button>
-            </div>
-          </form>
-        </div>
-      )}
+              <div>
+                <label htmlFor="section" className="block text-sm font-medium text-gray-700 mb-2">
+                  Section
+                </label>
+                <input
+                  type="text"
+                  id="section"
+                  name="section"
+                  value={formData.section}
+                  onChange={handleInputChange}
+                  className="input-field"
+                  placeholder="e.g., Trumpet, Drums, Guitar"
+                  required
+                />
+              </div>
+              {message && (
+                <div className={`p-4 rounded-xl text-sm ${
+                  message.includes('successfully') 
+                    ? 'message-success' 
+                    : 'message-error'
+                }`}>
+                  {message}
+                </div>
+              )}
+              <div className="flex space-x-3">
+                <button
+                  type="submit"
+                  disabled={submitting}
+                  className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {submitting ? 'Submitting...' : 'Submit Score'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowScoreForm(false)}
+                  className="btn-secondary"
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
+        )}
 
-      {/* Tab Navigation */}
-      <div className="flex border-b border-gray-200 mb-6">
-        <button
-          onClick={() => setActiveTab('daily')}
-          className={`px-4 py-2 font-medium ${
-            activeTab === 'daily'
-              ? 'text-blue-600 border-b-2 border-blue-600'
-              : 'text-gray-500 hover:text-gray-700'
-          }`}
-        >
-          Daily Rankings
-        </button>
-        <button
-          onClick={() => setActiveTab('monthly')}
-          className={`px-4 py-2 font-medium ${
-            activeTab === 'monthly'
-              ? 'text-blue-600 border-b-2 border-blue-600'
-              : 'text-gray-500 hover:text-gray-700'
-          }`}
-        >
-          Monthly Rankings
-        </button>
+        {/* Tab Navigation */}
+        <div className="flex border-b border-gray-200 mb-8">
+          <button
+            onClick={() => setActiveTab('daily')}
+            className={`tab-button ${activeTab === 'daily' ? 'active' : 'inactive'}`}
+          >
+            Daily Rankings
+          </button>
+          <button
+            onClick={() => setActiveTab('monthly')}
+            className={`tab-button ${activeTab === 'monthly' ? 'active' : 'inactive'}`}
+          >
+            Monthly Rankings
+          </button>
+        </div>
+
+        {/* Leaderboard Content */}
+        {loading ? (
+          <div className="text-center py-12">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto"></div>
+            <p className="mt-4 text-gray-600 text-lg">Loading leaderboards...</p>
+          </div>
+        ) : (
+          <div>
+            {activeTab === 'daily' ? renderDailyLeaderboard() : renderMonthlyLeaderboard()}
+          </div>
+        )}
       </div>
-
-      {/* Leaderboard Content */}
-      {loading ? (
-        <div className="text-center py-8">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto"></div>
-          <p className="mt-2 text-gray-600">Loading leaderboards...</p>
-        </div>
-      ) : (
-        <div>
-          {activeTab === 'daily' ? renderDailyLeaderboard() : renderMonthlyLeaderboard()}
-        </div>
-      )}
     </div>
   )
 }

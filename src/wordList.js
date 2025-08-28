@@ -1,32 +1,42 @@
-// Band Wordle - Music and Band Related 5-Letter Words
+// We'll use a comprehensive English word list instead of the problematic check-word library
+import { sixLetterWords } from './sixLetterWords.js'
+
+// Game configuration constant
+export const WORD_LENGTH = 6
+
+// Band Wordle - Music and Band Related 6-Letter Words (for daily rotation only)
 export const wordList = [
-  // Instruments
-  'PIANO', 'GUITAR', 'DRUMS', 'BASS', 'FLUTE', 'TRUMPET', 'VIOLA', 'CELLO', 'HARP', 'ORGAN',
-  'SAX', 'CLARINET', 'OBOE', 'TUBA', 'BANJO', 'MANDOLIN', 'UKULELE', 'ACCORDION', 'XYLOPHONE', 'TAMBOURINE',
-  
-  // Music Terms
-  'TEMPO', 'BEATS', 'RHYTHM', 'MELODY', 'HARMONY', 'CHORD', 'SCALE', 'NOTES', 'SHARP', 'FLAT',
-  'MINOR', 'MAJOR', 'SONG', 'TUNE', 'LYRIC', 'CHORUS', 'VERSE', 'BRIDGE', 'SOLO', 'DUET',
-  
-  // Band/Music Genres
-  'ROCK', 'JAZZ', 'BLUES', 'FOLK', 'PUNK', 'METAL', 'POP', 'RAP', 'SOUL', 'FUNK',
-  'REGG', 'DISCO', 'TECHNO', 'COUNTRY', 'CLASSICAL', 'OPERA', 'BALLET', 'MARCH', 'WALTZ', 'TANGO',
-  
-  // Band Related
-  'STAGE', 'MIC', 'AMP', 'CAB', 'PEDAL', 'CASE', 'STAND', 'MUSIC', 'SHEET', 'SCORE',
-  'BAND', 'GROUP', 'QUARTET', 'TRIO', 'DUO', 'CHOIR', 'ORCHESTRA', 'ENSEMBLE', 'SYMPHONY', 'CONCERT'
+  'GUITAR', 'MUSIEL', 'GIBSON', 'BALLET', 'STAFFS', 'TREBLE', 'CHORUS', 'LEGATO',
+  'RHYTHM', 'MELODY', 'BRIDGE', 'ACCENT', 'OCTAVE', 'ENCORE', 'PHRASE', 'MANUAL', 'FUSSEL',
+  'REGGAE', 'TECHNO', 'COUNTRY', 'OPERA', 'BALLET', 'CLASSICAL',
+  'SONATA', 'TUNING', 'UNISON', 'VOLUME', 'DECAPO', 'STUDIO', 'BALLAD', 'ANTHEM'
 ];
 
 // Get the word of the day based on the current date
 export function getWordOfTheDay() {
   const today = new Date();
-  const startDate = new Date('2024-01-01'); // Start date for consistent word rotation
+  const startDate = new Date('2025-08-27'); // Start date for consistent word rotation
   const daysSinceStart = Math.floor((today - startDate) / (1000 * 60 * 60 * 24));
   const wordIndex = daysSinceStart % wordList.length;
+  
+  // No debug logging to avoid console spam
+  
   return wordList[wordIndex];
 }
 
-// Check if a word is valid (in our word list)
-export function isValidWord(word) {
-  return wordList.includes(word.toUpperCase());
+// Check if a word is valid (correct length and exists in English dictionary)
+export function isValidWord(word, answer = null) {
+  // First check if it's exactly the right length
+  if (word.length !== WORD_LENGTH) {
+    return false;
+  }
+  
+  // If an answer is provided, check if the word matches it first
+  // This prevents false rejection of correct guesses that might be names or specific terms
+  if (answer && word.toUpperCase() === answer.toUpperCase()) {
+    return true;
+  }
+  
+  // Check if the word exists in our curated list of common 6-letter words
+  return sixLetterWords.includes(word.toLowerCase());
 } 

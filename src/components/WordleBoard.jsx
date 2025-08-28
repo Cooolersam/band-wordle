@@ -1,17 +1,18 @@
-import { useState, useEffect, useCallback } from 'react'
-import { getWordOfTheDay, isValidWord } from '../wordList'
+import { useState, useEffect } from 'react'
+import { getWordOfTheDay, isValidWord, WORD_LENGTH } from '../wordList'
 
 const WordleBoard = ({ onGameComplete, onShowLeaderboard }) => {
+  // Game configuration constants
+  const MAX_GUESSES = 6
+  
   const [wordOfTheDay] = useState(getWordOfTheDay())
-  const [guesses, setGuesses] = useState(Array(6).fill(''))
+  const [guesses, setGuesses] = useState(Array(MAX_GUESSES).fill().map(() => Array(WORD_LENGTH).fill('')))
   const [currentGuessIndex, setCurrentGuessIndex] = useState(0)
   const [gameComplete, setGameComplete] = useState(false)
   const [gameWon, setGameWon] = useState(false)
   const [message, setMessage] = useState('')
   const [keyStates, setKeyStates] = useState({})
-
-  const maxGuesses = 6
-  const wordLength = 5
+  const [isProcessing, setIsProcessing] = useState(false)
 
   // Check if a letter is in the correct position
   const isCorrectPosition = (letter, index) => {
@@ -24,13 +25,13 @@ const WordleBoard = ({ onGameComplete, onShowLeaderboard }) => {
     
     const letterCount = wordOfTheDay.split('').filter(l => l === letter).length
     const correctPositions = wordOfTheDay.split('').map((l, i) => l === letter && guesses[currentGuessIndex - 1]?.[i] === letter ? 1 : 0).reduce((a, b) => a + b, 0)
-    const presentInGuess = guesses[currentGuessIndex - 1]?.split('').map((l, i) => l === letter && !isCorrectPosition(l, i) ? 1 : 0).reduce((a, b) => a + b, 0)
+    const presentInGuess = guesses[currentGuessIndex - 1]?.filter(l => l === letter).length || 0
     
     return letterCount > correctPositions + presentInGuess
   }
 
   // Update key states based on current guess
-  const updateKeyStates = useCallback((guess) => {
+  const updateKeyStates = (guess) => {
     const newKeyStates = { ...keyStates }
     
     guess.split('').forEach((letter, index) => {
@@ -44,11 +45,11 @@ const WordleBoard = ({ onGameComplete, onShowLeaderboard }) => {
     })
     
     setKeyStates(newKeyStates)
-  }, [keyStates])
+  }
 
   // Handle key press
-  const handleKeyPress = useCallback((key) => {
-    if (gameComplete) return
+  const handleKeyPress = (key) => {
+    if (gameComplete || isProcessing) return
 
     if (key === 'Enter') {
       submitGuess()
@@ -57,22 +58,30 @@ const WordleBoard = ({ onGameComplete, onShowLeaderboard }) => {
     } else if (/^[A-Za-z]$/.test(key)) {
       addLetter(key.toUpperCase())
     }
-  }, [gameComplete])
+  }
 
   // Add letter to current guess
   const addLetter = (letter) => {
-    if (guesses[currentGuessIndex].length < wordLength) {
+    const currentGuess = guesses[currentGuessIndex]
+    // Find the first empty slot
+    const emptyIndex = currentGuess.findIndex(char => char === '')
+    if (emptyIndex !== -1) {
       const newGuesses = [...guesses]
-      newGuesses[currentGuessIndex] += letter
+      newGuesses[currentGuessIndex] = [...currentGuess]
+      newGuesses[currentGuessIndex][emptyIndex] = letter
       setGuesses(newGuesses)
     }
   }
 
   // Delete letter from current guess
   const deleteLetter = () => {
-    if (guesses[currentGuessIndex].length > 0) {
+    const currentGuess = guesses[currentGuessIndex]
+    // Find the last filled slot
+    const lastFilledIndex = currentGuess.map((char, index) => char !== '' ? index : -1).filter(index => index !== -1).pop()
+    if (lastFilledIndex !== undefined) {
       const newGuesses = [...guesses]
-      newGuesses[currentGuessIndex] = newGuesses[currentGuessIndex].slice(0, -1)
+      newGuesses[currentGuessIndex] = [...currentGuess]
+      newGuesses[currentGuessIndex][lastFilledIndex] = ''
       setGuesses(newGuesses)
     }
   }
@@ -80,35 +89,54 @@ const WordleBoard = ({ onGameComplete, onShowLeaderboard }) => {
   // Submit current guess
   const submitGuess = () => {
     const currentGuess = guesses[currentGuessIndex]
+    const currentGuessString = currentGuess.join('')
     
-    if (currentGuess.length !== wordLength) {
-      setMessage('Word must be 5 letters long')
+    console.log('Submitting guess:', currentGuessString)
+    
+    if (currentGuessString.length !== WORD_LENGTH) {
+      setMessage(`Word must be ${WORD_LENGTH} letters long`)
       setTimeout(() => setMessage(''), 2000)
       return
     }
     
-    if (!isValidWord(currentGuess)) {
-      setMessage('Not a valid word')
-      setTimeout(() => setMessage(''), 2000)
-      return
-    }
+    // Show immediate feedback that we're processing
+    setIsProcessing(true)
+    setMessage('Checking word...')
+    
+    // Validate the word
+    const isValid = isValidWord(currentGuessString, wordOfTheDay)
+    console.log('Word validation result:', isValid, 'for word:', currentGuessString)
+    
+    // Add a small delay to simulate processing and show feedback
+    setTimeout(() => {
+      if (!isValid) {
+        setIsProcessing(false)
+        setMessage('Not a valid word')
+        setTimeout(() => setMessage(''), 2000)
+        return
+      }
+      
+      // Clear processing state
+      setIsProcessing(false)
+      setMessage('')
+      
+      // Update key states
+      updateKeyStates(currentGuessString)
 
-    // Update key states
-    updateKeyStates(currentGuess)
-
-    // Check if won
-    if (currentGuess === wordOfTheDay) {
-      setGameWon(true)
-      setGameComplete(true)
-      onGameComplete(true, currentGuessIndex + 1)
-    } else if (currentGuessIndex === maxGuesses - 1) {
-      // Game over
-      setGameComplete(true)
-      onGameComplete(false, maxGuesses)
-    } else {
-      // Move to next guess
-      setCurrentGuessIndex(currentGuessIndex + 1)
-    }
+      // Check if won
+      if (currentGuessString === wordOfTheDay) {
+        setGameWon(true)
+        setGameComplete(true)
+        onGameComplete(true, currentGuessIndex + 1)
+      } else if (currentGuessIndex === MAX_GUESSES - 1) {
+        // Game over
+        setGameComplete(true)
+        onGameComplete(false, MAX_GUESSES)
+      } else {
+        // Move to next guess
+        setCurrentGuessIndex(currentGuessIndex + 1)
+      }
+        }, 100)
   }
 
   // Handle keyboard input
@@ -119,14 +147,15 @@ const WordleBoard = ({ onGameComplete, onShowLeaderboard }) => {
 
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [handleKeyPress])
+  }, [guesses, currentGuessIndex])
 
   // Render a single tile
   const renderTile = (letter, index, guessIndex) => {
+    // Show uncolored tiles for future guesses and current input row
     if (guessIndex >= currentGuessIndex) {
       return (
         <div key={index} className="wordle-tile">
-          {letter}
+          {letter || ''}
         </div>
       )
     }
@@ -161,12 +190,17 @@ const WordleBoard = ({ onGameComplete, onShowLeaderboard }) => {
           <div key={rowIndex} className="flex justify-center space-x-1">
             {row.map((key) => {
               let keyClass = 'keyboard-key'
-              if (keyStates[key]) {
-                keyClass += ` ${keyStates[key]}`
+              
+              // Add specific sizing classes
+              if (key === 'Enter' || key === 'Backspace') {
+                keyClass += ' special-key'
+              } else {
+                keyClass += ' letter-key'
               }
               
-              if (key === 'Enter' || key === 'Backspace') {
-                keyClass += ' px-4'
+              // Add state-based styling
+              if (keyStates[key]) {
+                keyClass += ` ${keyStates[key]}`
               }
 
               return (
@@ -186,55 +220,62 @@ const WordleBoard = ({ onGameComplete, onShowLeaderboard }) => {
   }
 
   return (
-    <div className="max-w-md mx-auto p-4">
-      <h1 className="text-3xl font-bold text-center mb-6 text-gray-800">
-        Band Wordle
-      </h1>
-      
-      {message && (
-        <div className="text-center mb-4 p-2 bg-yellow-100 text-yellow-800 rounded">
-          {message}
-        </div>
-      )}
-
-      {/* Game Board */}
-      <div className="space-y-2 mb-6">
-        {guesses.map((guess, guessIndex) => (
-          <div key={guessIndex} className="flex justify-center space-x-1">
-            {Array.from({ length: wordLength }, (_, index) => 
-              renderTile(guess[index] || '', index, guessIndex)
-            )}
+    <div className="min-h-screen p-6">
+      <div className="game-container max-w-lg mx-auto p-8">
+        <h1 className="text-4xl font-bold text-center mb-8 bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">
+          🎵 Band Wordle
+        </h1>
+        
+        {message && (
+          <div className={`text-center mb-6 p-4 rounded-xl ${
+            isProcessing 
+              ? 'message-info' 
+              : 'message-error'
+          }`}>
+            {isProcessing && <span className="mr-2">⏳</span>}
+            {message}
           </div>
-        ))}
+        )}
+
+        {/* Game Board */}
+        <div className="space-y-3 mb-8">
+          {guesses.map((guess, guessIndex) => (
+            <div key={guessIndex} className="flex justify-center space-x-2">
+              {Array.from({ length: WORD_LENGTH }, (_, index) => 
+                renderTile(guess[index] || '', index, guessIndex)
+              )}
+            </div>
+          ))}
+        </div>
+
+        {/* Game Complete Message */}
+        {gameComplete && (
+          <div className="text-center mb-8 p-6 bg-gradient-to-r from-amber-50 to-orange-50 rounded-2xl border border-amber-200">
+            <h2 className="text-2xl font-bold mb-3">
+              {gameWon ? '🎉 Congratulations! 🎉' : '😔 Game Over'}
+            </h2>
+            <p className="mb-6 text-gray-700">
+              {gameWon 
+                ? `You solved it in ${currentGuessIndex + 1} ${currentGuessIndex === 0 ? 'guess' : 'guesses'}!`
+                : `The word was: ${wordOfTheDay}`
+              }
+            </p>
+            <div className="space-x-3">
+              <button
+                onClick={() => onShowLeaderboard()}
+                className="btn-primary"
+              >
+                View Leaderboard
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Keyboard */}
+        {!gameComplete && renderKeyboard()}
       </div>
-
-      {/* Game Complete Message */}
-      {gameComplete && (
-        <div className="text-center mb-6 p-4 bg-gray-100 rounded-lg">
-          <h2 className="text-xl font-bold mb-2">
-            {gameWon ? '🎉 Congratulations! 🎉' : '😔 Game Over'}
-          </h2>
-          <p className="mb-4">
-            {gameWon 
-              ? `You solved it in ${currentGuessIndex + 1} ${currentGuessIndex === 0 ? 'guess' : 'guesses'}!`
-              : `The word was: ${wordOfTheDay}`
-            }
-          </p>
-          <div className="space-x-2">
-            <button
-              onClick={() => onShowLeaderboard()}
-              className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-            >
-              View Leaderboard
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* Keyboard */}
-      {!gameComplete && renderKeyboard()}
     </div>
   )
 }
 
-export default WordleBoard 
+export default WordleBoard

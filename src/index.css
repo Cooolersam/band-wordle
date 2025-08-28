@@ -5,39 +5,193 @@
 @layer base {
   body {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+    background: linear-gradient(135deg, #f97316 0%, #ea580c 25%, #dc2626 50%, #b91c1c 75%, #991b1b 100%);
+    min-height: 100vh;
   }
 }
 
 @layer components {
   .wordle-tile {
-    @apply w-12 h-12 border-2 border-gray-300 flex items-center justify-center text-2xl font-bold uppercase;
+    @apply w-14 h-14 border-2 border-gray-400 flex items-center justify-center text-2xl font-bold uppercase rounded-lg shadow-lg transition-all duration-300;
+    background: linear-gradient(145deg, #ffffff, #fef3c7);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
   }
   
   .wordle-tile.correct {
-    @apply bg-green-500 border-green-500 text-white;
+    @apply border-emerald-500 text-white;
+    background: linear-gradient(145deg, #10b981, #059669);
+    box-shadow: 0 4px 20px rgba(16, 185, 129, 0.4);
+    transform: scale(1.05);
   }
   
   .wordle-tile.present {
-    @apply bg-yellow-500 border-yellow-500 text-white;
+    @apply border-amber-500 text-white;
+    background: linear-gradient(145deg, #f59e0b, #d97706);
+    box-shadow: 0 4px 20px rgba(245, 158, 11, 0.4);
+    transform: scale(1.05);
   }
   
   .wordle-tile.absent {
-    @apply bg-gray-500 border-gray-500 text-white;
+    @apply border-slate-600 text-white;
+    background: linear-gradient(145deg, #475569, #334155);
+    box-shadow: 0 4px 20px rgba(71, 85, 105, 0.4);
+    transform: scale(1.05);
   }
   
   .keyboard-key {
-    @apply px-3 py-2 m-1 text-sm font-semibold text-gray-800 bg-gray-200 rounded-lg hover:bg-gray-300 transition-colors;
+    @apply py-3 m-1 text-sm font-bold text-slate-800 bg-white rounded-xl hover:bg-amber-50 transition-all duration-200 cursor-pointer;
+    background: linear-gradient(145deg, #ffffff, #fef3c7);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    border: 1px solid #fbbf24;
+    min-width: 44px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .keyboard-key.letter-key {
+    @apply px-4;
+    width: 44px;
+  }
+
+  .keyboard-key.special-key {
+    @apply px-6;
+    width: 72px;
+  }
+  
+  .keyboard-key:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+    background: linear-gradient(145deg, #fef3c7, #fde68a);
   }
   
   .keyboard-key.correct {
-    @apply bg-green-500 text-white hover:bg-green-600;
+    @apply text-white;
+    background: linear-gradient(145deg, #10b981, #059669);
+    box-shadow: 0 4px 20px rgba(16, 185, 129, 0.4);
+    border-color: #10b981;
   }
   
   .keyboard-key.present {
-    @apply bg-yellow-500 text-white hover:bg-yellow-600;
+    @apply text-white;
+    background: linear-gradient(145deg, #f59e0b, #d97706);
+    box-shadow: 0 4px 20px rgba(245, 158, 11, 0.4);
+    border-color: #f59e0b;
   }
   
   .keyboard-key.absent {
-    @apply bg-gray-500 text-white hover:bg-gray-600;
+    @apply text-white;
+    background: linear-gradient(145deg, #475569, #334155);
+    box-shadow: 0 4px 20px rgba(71, 85, 105, 0.4);
+    border-color: #475569;
+  }
+
+  .game-container {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    border-radius: 24px;
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+    border: 1px solid rgba(251, 191, 36, 0.3);
+  }
+
+  .leaderboard-container {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    border-radius: 24px;
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+    border: 1px solid rgba(251, 191, 36, 0.3);
+  }
+
+  .btn-primary {
+    @apply px-6 py-3 text-white font-semibold rounded-xl transition-all duration-200 transform hover:scale-105;
+    background: linear-gradient(135deg, #f97316, #ea580c);
+    box-shadow: 0 4px 15px rgba(249, 115, 22, 0.4);
+  }
+
+  .btn-primary:hover {
+    background: linear-gradient(135deg, #ea580c, #dc2626);
+    box-shadow: 0 6px 20px rgba(249, 115, 22, 0.6);
+  }
+
+  .btn-secondary {
+    @apply px-6 py-3 text-white font-semibold rounded-xl transition-all duration-200 transform hover:scale-105;
+    background: linear-gradient(135deg, #475569, #334155);
+    box-shadow: 0 4px 15px rgba(71, 85, 105, 0.4);
+  }
+
+  .btn-secondary:hover {
+    background: linear-gradient(135deg, #334155, #1e293b);
+    box-shadow: 0 6px 20px rgba(71, 85, 105, 0.6);
+  }
+
+  .score-card {
+    @apply p-4 rounded-xl border transition-all duration-200;
+    background: linear-gradient(135deg, #fef3c7, #fde68a);
+    border-color: #fbbf24;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  }
+
+  .score-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    background: linear-gradient(135deg, #fde68a, #fcd34d);
+  }
+
+  .tab-button {
+    @apply px-6 py-3 font-semibold transition-all duration-200 border-b-2;
+  }
+
+  .tab-button.active {
+    @apply text-orange-600 border-orange-600;
+  }
+
+  .tab-button.inactive {
+    @apply text-slate-500 hover:text-slate-700 border-transparent hover:border-amber-300;
+  }
+
+  .input-field {
+    @apply w-full px-4 py-3 border border-amber-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200;
+    background: linear-gradient(145deg, #ffffff, #fef3c7);
+  }
+
+  .input-field:focus {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 15px rgba(249, 115, 22, 0.2);
+  }
+
+  .message-success {
+    @apply p-3 text-emerald-800 rounded-xl border;
+    background: linear-gradient(135deg, #d1fae5, #a7f3d0);
+    border-color: #10b981;
+  }
+
+  .message-error {
+    @apply p-3 text-red-800 rounded-xl border;
+    background: linear-gradient(135deg, #fee2e2, #fecaca);
+    border-color: #ef4444;
+  }
+
+  .message-info {
+    @apply p-3 text-blue-800 rounded-xl border;
+    background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+    border-color: #3b82f6;
+  }
+
+  .rank-badge {
+    @apply inline-flex items-center justify-center w-8 h-8 text-sm font-bold text-white rounded-full;
+    background: linear-gradient(145deg, #f97316, #ea580c);
+  }
+
+  .rank-badge.gold {
+    background: linear-gradient(145deg, #fbbf24, #f59e0b);
+  }
+
+  .rank-badge.silver {
+    background: linear-gradient(145deg, #9ca3af, #6b7280);
+  }
+
+  .rank-badge.bronze {
+    background: linear-gradient(145deg, #d97706, #b45309);
   }
 }
