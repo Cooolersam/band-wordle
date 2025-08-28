@@ -219,7 +219,7 @@ const Leaderboard = ({ gameResult, onBackToGame }) => {
       <div className="leaderboard-container max-w-4xl mx-auto p-8">
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-4xl font-bold bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">
-            🏆 Leaderboard
+            Leaderboard
           </h1>
           <button
             onClick={onBackToGame}
@@ -251,7 +251,7 @@ const Leaderboard = ({ gameResult, onBackToGame }) => {
         {/* Already Submitted Message */}
         {gameResult && hasSubmittedToday && (
           <div className="mb-8 p-6 bg-gradient-to-r from-emerald-50 to-green-50 rounded-2xl border border-emerald-200">
-            <h2 className="text-2xl font-bold mb-3 text-gray-800">✅ Score Already Submitted</h2>
+            <h2 className="text-2xl font-bold mb-3 text-gray-800">Score Already Submitted</h2>
             <p className="mb-4 text-gray-700">
               You've already submitted your score for today. Come back tomorrow for another game!
             </p>

@@ -238,8 +238,7 @@ const WordleBoard = ({ onGameComplete, onShowLeaderboard }) => {
         
         {/* Mobile keyboard instructions */}
         <div className="sm:hidden text-center text-gray-600 text-sm">
-          <p>💡 Use your phone's keyboard to type letters</p>
-          <p className="mt-1">Press Enter to submit, Backspace to delete</p>
+          <p>Tap the game board to type</p>
         </div>
       </div>
     )
@@ -249,13 +248,13 @@ const WordleBoard = ({ onGameComplete, onShowLeaderboard }) => {
     <div className="min-h-screen p-2 sm:p-6">
       <div className="game-container max-w-lg mx-auto p-4 sm:p-8">
         <h1 className="text-3xl sm:text-4xl font-bold text-center mb-6 sm:mb-8 bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">
-          🎵 Band Wordle
+          Band Wordle
         </h1>
         
         {/* Mobile instructions */}
         <div className="sm:hidden text-center mb-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
           <p className="text-blue-800 text-sm">
-            📱 <strong>Mobile Tip:</strong> Tap on the game board to start typing with your phone's keyboard
+            <strong>Tap on the game board to start typing</strong>
           </p>
         </div>
         
@@ -265,7 +264,6 @@ const WordleBoard = ({ onGameComplete, onShowLeaderboard }) => {
               ? 'message-info' 
               : 'message-error'
           }`}>
-            {isProcessing && <span className="mr-2">⏳</span>}
             {message}
           </div>
         )}
@@ -285,7 +283,7 @@ const WordleBoard = ({ onGameComplete, onShowLeaderboard }) => {
         {gameComplete && (
           <div className="text-center mb-6 sm:mb-8 p-4 sm:p-6 bg-gradient-to-r from-amber-50 to-orange-50 rounded-xl sm:rounded-2xl border border-amber-200">
             <h2 className="text-xl sm:text-2xl font-bold mb-2 sm:mb-3">
-              {gameWon ? '🎉 Congratulations! 🎉' : '😔 Game Over'}
+              {gameWon ? 'Congratulations!' : 'Game Over'}
             </h2>
             <p className="mb-4 sm:mb-6 text-gray-700 text-sm sm:text-base">
               {gameWon 
