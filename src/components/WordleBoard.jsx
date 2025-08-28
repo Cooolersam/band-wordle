@@ -202,49 +202,65 @@ const WordleBoard = ({ onGameComplete, onShowLeaderboard }) => {
     ]
 
     return (
-      <div className="mt-8 space-y-2">
-        {keys.map((row, rowIndex) => (
-          <div key={rowIndex} className="flex justify-center space-x-1">
-            {row.map((key) => {
-              let keyClass = 'keyboard-key'
-              
-              // Add specific sizing classes
-              if (key === 'Enter' || key === 'Backspace') {
-                keyClass += ' special-key'
-              } else {
-                keyClass += ' letter-key'
-              }
-              
-              // Add state-based styling
-              if (keyStates[key]) {
-                keyClass += ` ${keyStates[key]}`
-              }
+      <div className="mt-6 sm:mt-8 space-y-1 sm:space-y-2">
+        {/* Show virtual keyboard only on desktop */}
+        <div className="hidden sm:block">
+          {keys.map((row, rowIndex) => (
+            <div key={rowIndex} className="flex justify-center space-x-1">
+              {row.map((key) => {
+                let keyClass = 'keyboard-key'
+                
+                // Add specific sizing classes
+                if (key === 'Enter' || key === 'Backspace') {
+                  keyClass += ' special-key'
+                } else {
+                  keyClass += ' letter-key'
+                }
+                
+                // Add state-based styling
+                if (keyStates[key]) {
+                  keyClass += ` ${keyStates[key]}`
+                }
 
-              return (
-                <button
-                  key={key}
-                  className={keyClass}
-                  onClick={() => handleKeyPress(key === 'Enter' ? 'Enter' : key === 'Backspace' ? 'Backspace' : key)}
-                >
-                  {key === 'Backspace' ? '⌫' : key}
-                </button>
-              )
-            })}
-          </div>
-        ))}
+                return (
+                  <button
+                    key={key}
+                    className={keyClass}
+                    onClick={() => handleKeyPress(key === 'Enter' ? 'Enter' : key === 'Backspace' ? 'Backspace' : key)}
+                  >
+                    {key === 'Backspace' ? '⌫' : key}
+                  </button>
+                )
+              })}
+            </div>
+          ))}
+        </div>
+        
+        {/* Mobile keyboard instructions */}
+        <div className="sm:hidden text-center text-gray-600 text-sm">
+          <p>💡 Use your phone's keyboard to type letters</p>
+          <p className="mt-1">Press Enter to submit, Backspace to delete</p>
+        </div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen p-6">
-      <div className="game-container max-w-lg mx-auto p-8">
-        <h1 className="text-4xl font-bold text-center mb-8 bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">
+    <div className="min-h-screen p-2 sm:p-6">
+      <div className="game-container max-w-lg mx-auto p-4 sm:p-8">
+        <h1 className="text-3xl sm:text-4xl font-bold text-center mb-6 sm:mb-8 bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">
           🎵 Band Wordle
         </h1>
         
+        {/* Mobile instructions */}
+        <div className="sm:hidden text-center mb-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
+          <p className="text-blue-800 text-sm">
+            📱 <strong>Mobile Tip:</strong> Tap on the game board to start typing with your phone's keyboard
+          </p>
+        </div>
+        
         {message && (
-          <div className={`text-center mb-6 p-4 rounded-xl ${
+          <div className={`text-center mb-4 sm:mb-6 p-3 sm:p-4 rounded-xl ${
             isProcessing 
               ? 'message-info' 
               : 'message-error'
@@ -255,9 +271,9 @@ const WordleBoard = ({ onGameComplete, onShowLeaderboard }) => {
         )}
 
         {/* Game Board */}
-        <div className="space-y-3 mb-8">
+        <div className="space-y-2 sm:space-y-3 mb-6 sm:mb-8">
           {guesses.map((guess, guessIndex) => (
-            <div key={guessIndex} className="flex justify-center space-x-2">
+            <div key={guessIndex} className="flex justify-center space-x-1 sm:space-x-2">
               {Array.from({ length: WORD_LENGTH }, (_, index) => 
                 renderTile(guess[index] || '', index, guessIndex)
               )}
@@ -267,17 +283,17 @@ const WordleBoard = ({ onGameComplete, onShowLeaderboard }) => {
 
         {/* Game Complete Message */}
         {gameComplete && (
-          <div className="text-center mb-8 p-6 bg-gradient-to-r from-amber-50 to-orange-50 rounded-2xl border border-amber-200">
-            <h2 className="text-2xl font-bold mb-3">
+          <div className="text-center mb-6 sm:mb-8 p-4 sm:p-6 bg-gradient-to-r from-amber-50 to-orange-50 rounded-xl sm:rounded-2xl border border-amber-200">
+            <h2 className="text-xl sm:text-2xl font-bold mb-2 sm:mb-3">
               {gameWon ? '🎉 Congratulations! 🎉' : '😔 Game Over'}
             </h2>
-            <p className="mb-6 text-gray-700">
+            <p className="mb-4 sm:mb-6 text-gray-700 text-sm sm:text-base">
               {gameWon 
                 ? `You solved it in ${currentGuessIndex + 1} ${currentGuessIndex === 0 ? 'guess' : 'guesses'}!`
                 : `The word was: ${wordOfTheDay}`
               }
             </p>
-            <div className="space-x-3">
+            <div className="space-x-2 sm:space-x-3">
               <button
                 onClick={() => onShowLeaderboard()}
                 className="btn-primary"

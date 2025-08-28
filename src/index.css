@@ -7,14 +7,22 @@
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
     background: linear-gradient(135deg, #f97316 0%, #ea580c 25%, #dc2626 50%, #b91c1c 75%, #991b1b 100%);
     min-height: 100vh;
+    overflow-x: hidden; /* Prevent horizontal scroll */
   }
 }
 
 @layer components {
   .wordle-tile {
-    @apply w-14 h-14 border-2 border-gray-400 flex items-center justify-center text-2xl font-bold uppercase rounded-lg shadow-lg transition-all duration-300;
-    background: linear-gradient(145deg, #ffffff, #fef3c7);
+    @apply w-12 h-12 border-2 border-gray-400 flex items-center justify-center text-xl font-bold uppercase rounded-lg shadow-lg transition-all duration-300;
+    background: linear-gradient(145deg, #ffffff, #f0f0f0);
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Mobile adjustments for tiles */
+  @media (max-width: 640px) {
+    .wordle-tile {
+      @apply w-10 h-10 text-lg;
+    }
   }
   
   .wordle-tile.correct {
@@ -39,25 +47,54 @@
   }
   
   .keyboard-key {
-    @apply py-3 m-1 text-sm font-bold text-slate-800 bg-white rounded-xl hover:bg-amber-50 transition-all duration-200 cursor-pointer;
+    @apply py-2 m-0.5 text-xs font-bold text-slate-800 bg-white rounded-lg hover:bg-amber-50 transition-all duration-200 cursor-pointer;
     background: linear-gradient(145deg, #ffffff, #fef3c7);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     border: 1px solid #fbbf24;
-    min-width: 44px;
-    height: 48px;
+    min-width: 32px;
+    height: 40px;
     display: flex;
     align-items: center;
     justify-content: center;
+    flex-shrink: 0;
   }
 
-  .keyboard-key.letter-key {
-    @apply px-4;
-    width: 44px;
+  /* Mobile keyboard adjustments */
+  @media (max-width: 640px) {
+    .keyboard-key {
+      @apply py-1.5 m-0.5 text-xs;
+      min-width: 28px;
+      height: 36px;
+    }
+    
+    .keyboard-key.letter-key {
+      @apply px-2;
+      width: 28px;
+    }
+    
+    .keyboard-key.special-key {
+      @apply px-3;
+      width: 48px;
+    }
   }
 
-  .keyboard-key.special-key {
-    @apply px-6;
-    width: 72px;
+  /* Desktop keyboard */
+  @media (min-width: 641px) {
+    .keyboard-key {
+      @apply py-3 m-1 text-sm;
+      min-width: 44px;
+      height: 48px;
+    }
+    
+    .keyboard-key.letter-key {
+      @apply px-4;
+      width: 44px;
+    }
+    
+    .keyboard-key.special-key {
+      @apply px-6;
+      width: 72px;
+    }
   }
   
   .keyboard-key:hover {
@@ -93,6 +130,16 @@
     border-radius: 24px;
     box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
     border: 1px solid rgba(251, 191, 36, 0.3);
+    max-width: 100vw;
+    overflow: hidden;
+  }
+
+  /* Mobile container adjustments */
+  @media (max-width: 640px) {
+    .game-container {
+      @apply mx-2 p-4;
+      border-radius: 16px;
+    }
   }
 
   .leaderboard-container {
@@ -101,6 +148,16 @@
     border-radius: 24px;
     box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
     border: 1px solid rgba(251, 191, 36, 0.3);
+    max-width: 100vw;
+    overflow: hidden;
+  }
+
+  /* Mobile leaderboard adjustments */
+  @media (max-width: 640px) {
+    .leaderboard-container {
+      @apply mx-2 p-4;
+      border-radius: 16px;
+    }
   }
 
   .btn-primary {
