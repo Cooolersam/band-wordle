@@ -218,7 +218,7 @@ const Leaderboard = ({ gameResult, onBackToGame }) => {
     <div className="min-h-screen p-6">
       <div className="leaderboard-container max-w-4xl mx-auto p-8">
         <div className="flex justify-between items-center mb-8">
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-800 to-blue-900 bg-clip-text text-transparent">
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-900 to-slate-900 bg-clip-text text-transparent">
             Leaderboard
           </h1>
           <button
