@@ -6,7 +6,7 @@ export const WORD_LENGTH = 6
 
 // Band Wordle - Music and Band Related 6-Letter Words (for daily rotation only)
 export const wordList = [
-  'GUITAR', 'MUSIEL', 'GIBSON', 'BALLET', 'STAFFS', 'TREBLE', 'CHORUS', 'LEGATO',
+  'MUSIEL', 'GUITAR', 'GIBSON', 'BALLET', 'STAFFS', 'TREBLE', 'CHORUS', 'LEGATO',
   'RHYTHM', 'MELODY', 'BRIDGE', 'ACCENT', 'OCTAVE', 'ENCORE', 'PHRASE', 'MANUAL', 'FUSSEL',
   'REGGAE', 'TECHNO', 'COUNTRY', 'OPERA', 'BALLET', 'CLASSICAL',
   'SONATA', 'TUNING', 'UNISON', 'VOLUME', 'DECAPO', 'STUDIO', 'BALLAD', 'ANTHEM'
@@ -15,7 +15,7 @@ export const wordList = [
 // Get the word of the day based on the current date
 export function getWordOfTheDay() {
   const today = new Date();
-  const startDate = new Date('2025-08-27'); // Start date for consistent word rotation
+  const startDate = new Date('2025-08-28'); // Start date adjusted so today shows MUSIEL
   const daysSinceStart = Math.floor((today - startDate) / (1000 * 60 * 60 * 24));
   const wordIndex = daysSinceStart % wordList.length;
   
