@@ -21,13 +21,30 @@ const WordleBoard = ({ onGameComplete, onShowLeaderboard }) => {
 
   // Check if a letter exists in the word but wrong position
   const isPresent = (letter, index) => {
+    // If this letter is in the correct position, it's not "present" in wrong position
     if (isCorrectPosition(letter, index)) return false
     
-    const letterCount = wordOfTheDay.split('').filter(l => l === letter).length
-    const correctPositions = wordOfTheDay.split('').map((l, i) => l === letter && guesses[currentGuessIndex - 1]?.[i] === letter ? 1 : 0).reduce((a, b) => a + b, 0)
-    const presentInGuess = guesses[currentGuessIndex - 1]?.filter(l => l === letter).length || 0
+    // Check if the letter exists anywhere else in the word
+    const letterExistsElsewhere = wordOfTheDay.includes(letter)
     
-    return letterCount > correctPositions + presentInGuess
+    if (!letterExistsElsewhere) return false
+    
+    // Count how many times this letter appears in the word
+    const letterCountInWord = wordOfTheDay.split('').filter(l => l === letter).length
+    
+    // Count how many times this letter appears in the current guess
+    const letterCountInGuess = guesses[currentGuessIndex - 1]?.filter(l => l === letter).length || 0
+    
+    // Count how many times this letter is in correct positions in the current guess
+    const correctPositionsInGuess = wordOfTheDay.split('').map((l, i) => 
+      l === letter && guesses[currentGuessIndex - 1]?.[i] === letter ? 1 : 0
+    ).reduce((a, b) => a + b, 0)
+    
+    // A letter is "present" if:
+    // 1. It exists in the word
+    // 2. It's not in the correct position at this index
+    // 3. There are still "unused" instances of this letter
+    return letterCountInWord > correctPositionsInGuess
   }
 
   // Update key states based on current guess
