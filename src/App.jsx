@@ -2,19 +2,20 @@ import { useState, useEffect } from 'react'
 import WordleBoard from './components/WordleBoard'
 import Leaderboard from './components/Leaderboard'
 import AdminPanel from './components/AdminPanel'
+import PasswordScreen from './components/PasswordScreen'
 
 function App() {
   const [currentView, setCurrentView] = useState('game')
   const [gameResult, setGameResult] = useState(null)
   const [adminMode, setAdminMode] = useState(false)
+  const [showPasswordScreen, setShowPasswordScreen] = useState(false)
 
   // Hidden admin access: Press Ctrl+Shift+A to access admin panel
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.ctrlKey && e.shiftKey && e.key === 'A') {
         e.preventDefault()
-        setAdminMode(true)
-        setCurrentView('admin')
+        setShowPasswordScreen(true)
       }
     }
 
@@ -35,11 +36,27 @@ function App() {
     setCurrentView('game')
     setGameResult(null)
     setAdminMode(false)
+    setShowPasswordScreen(false)
+  }
+
+  const handlePasswordCorrect = () => {
+    setShowPasswordScreen(false)
+    setAdminMode(true)
+    setCurrentView('admin')
+  }
+
+  const handlePasswordCancel = () => {
+    setShowPasswordScreen(false)
   }
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {currentView === 'game' ? (
+      {showPasswordScreen ? (
+        <PasswordScreen 
+          onPasswordCorrect={handlePasswordCorrect}
+          onCancel={handlePasswordCancel}
+        />
+      ) : currentView === 'game' ? (
         <WordleBoard 
           onGameComplete={handleGameComplete}
           onShowLeaderboard={handleShowLeaderboard}
