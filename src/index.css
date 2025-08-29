@@ -41,7 +41,57 @@
     @apply border-emerald-500 text-white;
     background: linear-gradient(145deg, #10b981, #059669);
     box-shadow: 0 4px 20px rgba(16, 185, 129, 0.4);
-    transform: scale(1.05);
+    animation: correctTileFall 0.6s ease-out forwards;
+  }
+
+  @keyframes correctTileFall {
+    0% {
+      transform: translateY(-20px) scale(0.8);
+      opacity: 0;
+    }
+    50% {
+      transform: translateY(5px) scale(1.1);
+      opacity: 1;
+    }
+    100% {
+      transform: translateY(0) scale(1.05);
+      opacity: 1;
+    }
+  }
+
+  .winning-row {
+    animation: winningRowCelebration 1.2s ease-out forwards;
+  }
+
+  @keyframes winningRowCelebration {
+    0% {
+      transform: scale(1);
+    }
+    25% {
+      transform: scale(1.02);
+    }
+    50% {
+      transform: scale(1.05);
+    }
+    75% {
+      transform: scale(1.02);
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
+
+  .winning-row .wordle-tile.correct {
+    animation: correctTileFall 0.6s ease-out forwards, correctTileGlow 2s ease-in-out infinite;
+  }
+
+  @keyframes correctTileGlow {
+    0%, 100% {
+      box-shadow: 0 4px 20px rgba(16, 185, 129, 0.4);
+    }
+    50% {
+      box-shadow: 0 8px 30px rgba(16, 185, 129, 0.8), 0 0 20px rgba(16, 185, 129, 0.6);
+    }
   }
   
   .wordle-tile.present {

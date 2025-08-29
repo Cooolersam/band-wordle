@@ -145,6 +145,12 @@ const WordleBoard = ({ onGameComplete, onShowLeaderboard }) => {
         setGameWon(true)
         setGameComplete(true)
         onGameComplete(true, currentGuessIndex + 1)
+        
+        // Add celebration effect to the winning row
+        const winningRow = document.querySelector(`[data-guess="${currentGuessIndex}"]`)
+        if (winningRow) {
+          winningRow.classList.add('winning-row')
+        }
       } else if (currentGuessIndex === MAX_GUESSES - 1) {
         // Game over
         setGameComplete(true)
@@ -187,8 +193,12 @@ const WordleBoard = ({ onGameComplete, onShowLeaderboard }) => {
     }
 
     let tileClass = 'wordle-tile'
+    let animationStyle = {}
+    
     if (isCorrectPosition(letter, index)) {
       tileClass += ' correct'
+      // Add staggered animation delay for each tile
+      animationStyle = { animationDelay: `${index * 0.1}s` }
     } else if (isPresent(letter, index)) {
       tileClass += ' present'
     } else {
@@ -196,7 +206,7 @@ const WordleBoard = ({ onGameComplete, onShowLeaderboard }) => {
     }
 
     return (
-      <div key={index} className={tileClass}>
+      <div key={index} className={tileClass} style={animationStyle}>
         {letter}
       </div>
     )
@@ -294,7 +304,7 @@ const WordleBoard = ({ onGameComplete, onShowLeaderboard }) => {
           onClick={handleGridClick}
         >
           {guesses.map((guess, guessIndex) => (
-            <div key={guessIndex} className="flex justify-center space-x-1 sm:space-x-2">
+            <div key={guessIndex} className="flex justify-center space-x-1 sm:space-x-2" data-guess={guessIndex}>
               {Array.from({ length: WORD_LENGTH }, (_, index) => 
                 renderTile(guess[index] || '', index, guessIndex)
               )}
