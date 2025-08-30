@@ -15,6 +15,22 @@ export const wordList = [
 // Get the word of the day based on the current date
 export function getWordOfTheDay() {
   const today = new Date();
+  
+  // Check if it's a weekend (Saturday = 6, Sunday = 0)
+  const dayOfWeek = today.getDay();
+  if (dayOfWeek === 0 || dayOfWeek === 6) {
+    return null; // No word on weekends
+  }
+  
+  // Check if it's Labor Day (first Monday in September)
+  const month = today.getMonth(); // 8 = September
+  const date = today.getDate();
+  const isLaborDay = month === 8 && date <= 7 && dayOfWeek === 1; // Monday in first week of September
+  
+  if (isLaborDay) {
+    return null; // No word on Labor Day
+  }
+  
   const startDate = new Date('2025-08-28'); // Start date adjusted so today shows MUSIEL
   const daysSinceStart = Math.floor((today - startDate) / (1000 * 60 * 60 * 24));
   const wordIndex = daysSinceStart % wordList.length;

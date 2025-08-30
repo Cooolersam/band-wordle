@@ -16,6 +16,28 @@ const WordleBoard = ({ playerInfo, onGameComplete, onShowLeaderboard }) => {
   const [isProcessing, setIsProcessing] = useState(false)
   const [winningRowIndex, setWinningRowIndex] = useState(null)
   const [scoreSubmitted, setScoreSubmitted] = useState(false)
+  
+  // Check if there's no word today (weekends or holidays)
+  if (!wordOfTheDay) {
+    return (
+      <div className="min-h-screen flex items-center justify-center p-4 bg-blue-50">
+        <div className="max-w-md w-full bg-white rounded-2xl shadow-xl p-8 border border-blue-200 text-center">
+          <h1 className="text-4xl font-bold text-blue-900 mb-4">🎵 Band Wordle 🎵</h1>
+          <div className="text-6xl mb-6">🏖️</div>
+          <h2 className="text-2xl font-bold text-gray-800 mb-4">No Word Today!</h2>
+          <p className="text-gray-600 mb-6">
+            Band Wordle is only available on weekdays. 
+            Take a break and come back Monday through Friday!
+          </p>
+          <div className="text-sm text-gray-500">
+            <p>Weekends: No game</p>
+            <p>Labor Day: No game</p>
+            <p>Weekdays: Daily word puzzle!</p>
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   // Submit score to database
   const submitScore = async (won, guesses) => {
@@ -115,7 +137,7 @@ const WordleBoard = ({ playerInfo, onGameComplete, onShowLeaderboard }) => {
 
   // Handle key press
   const handleKeyPress = (key) => {
-    if (gameComplete || isProcessing) return
+    if (gameComplete || isProcessing || !wordOfTheDay) return
 
     if (key === 'Enter') {
       submitGuess()
@@ -128,6 +150,8 @@ const WordleBoard = ({ playerInfo, onGameComplete, onShowLeaderboard }) => {
 
   // Add letter to current guess
   const addLetter = (letter) => {
+    if (!wordOfTheDay) return
+    
     const currentGuess = guesses[currentGuessIndex]
     // Find the first empty slot
     const emptyIndex = currentGuess.findIndex(char => char === '')
@@ -141,6 +165,8 @@ const WordleBoard = ({ playerInfo, onGameComplete, onShowLeaderboard }) => {
 
   // Delete letter from current guess
   const deleteLetter = () => {
+    if (!wordOfTheDay) return
+    
     const currentGuess = guesses[currentGuessIndex]
     // Find the last filled slot
     const lastFilledIndex = currentGuess.map((char, index) => char !== '' ? index : -1).filter(index => index !== -1).pop()
@@ -154,6 +180,8 @@ const WordleBoard = ({ playerInfo, onGameComplete, onShowLeaderboard }) => {
 
   // Submit current guess
   const submitGuess = () => {
+    if (!wordOfTheDay) return
+    
     const currentGuess = guesses[currentGuessIndex]
     const currentGuessString = currentGuess.join('')
     
