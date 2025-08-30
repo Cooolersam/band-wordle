@@ -4,8 +4,8 @@
 
 @layer base {
   body {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
-    background: linear-gradient(135deg, #1e40af 0%, #3b82f6 25%, #60a5fa 50%, #93c5fd 75%, #dbeafe 100%);
+    font-family: 'Palatino', 'Book Antiqua', serif;
+    background: #e0f2fe;
     min-height: 100vh;
     overflow-x: hidden; /* Prevent horizontal scroll */
   }
@@ -26,7 +26,7 @@
 @layer components {
   .wordle-tile {
     @apply w-12 h-12 border-2 border-gray-400 flex items-center justify-center text-xl font-bold uppercase rounded-lg shadow-lg transition-all duration-300;
-    background: linear-gradient(145deg, #ffffff, #f0f0f0);
+    background: #ffffff;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
   }
   
@@ -39,9 +39,9 @@
   
   .wordle-tile.correct {
     @apply border-emerald-500 text-white;
-    background: linear-gradient(145deg, #10b981, #059669);
+    background: #10b981;
     box-shadow: 0 4px 20px rgba(16, 185, 129, 0.4);
-    animation: correctTileFall 0.6s ease-out forwards;
+    transform: scale(1.05);
   }
 
   @keyframes correctTileFall {
@@ -83,6 +83,9 @@
 
   .winning-row .wordle-tile.correct {
     animation: correctTileFall 0.6s ease-out forwards, correctTileGlow 2s ease-in-out infinite;
+    background: #10b981;
+    border-color: #10b981;
+    color: white;
   }
 
   @keyframes correctTileGlow {
@@ -96,21 +99,21 @@
   
   .wordle-tile.present {
     @apply border-amber-500 text-white;
-    background: linear-gradient(145deg, #f59e0b, #d97706);
+    background: #f59e0b;
     box-shadow: 0 4px 20px rgba(245, 158, 11, 0.4);
     transform: scale(1.05);
   }
   
   .wordle-tile.absent {
     @apply border-slate-600 text-white;
-    background: linear-gradient(145deg, #475569, #334155);
+    background: #475569;
     box-shadow: 0 4px 20px rgba(71, 85, 105, 0.4);
     transform: scale(1.05);
   }
   
   .keyboard-key {
     @apply py-2 m-0.5 text-xs font-bold text-slate-800 rounded-lg hover:bg-blue-50 transition-all duration-200 cursor-pointer;
-    background: linear-gradient(145deg, #f8fafc, #e0f2fe);
+    background: #f8fafc;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     border: 1px solid #3b82f6;
     min-width: 32px;
@@ -162,32 +165,32 @@
   .keyboard-key:hover {
     transform: translateY(-2px);
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
-    background: linear-gradient(145deg, #e0f2fe, #bae6fd);
+    background: #e0f2fe;
   }
   
   .keyboard-key.correct {
     @apply text-white;
-    background: linear-gradient(145deg, #10b981, #059669);
+    background: #10b981;
     box-shadow: 0 4px 20px rgba(16, 185, 129, 0.4);
     border-color: #10b981;
   }
   
   .keyboard-key.present {
     @apply text-white;
-    background: linear-gradient(145deg, #f59e0b, #d97706);
+    background: #f59e0b;
     box-shadow: 0 4px 20px rgba(245, 158, 11, 0.4);
     border-color: #f59e0b;
   }
   
   .keyboard-key.absent {
     @apply text-white;
-    background: linear-gradient(145deg, #475569, #334155);
+    background: #475569;
     box-shadow: 0 4px 20px rgba(71, 85, 105, 0.4);
     border-color: #475569;
   }
 
   .game-container {
-    background: linear-gradient(145deg, rgba(147, 197, 253, 0.95), rgba(191, 219, 254, 0.95));
+    background: #bfdbfe;
     backdrop-filter: blur(20px);
     border-radius: 24px;
     box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
@@ -205,7 +208,7 @@
   }
 
   .leaderboard-container {
-    background: linear-gradient(145deg, rgba(147, 197, 253, 0.95), rgba(191, 219, 254, 0.95));
+    background: #bfdbfe;
     backdrop-filter: blur(20px);
     border-radius: 24px;
     box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
@@ -224,29 +227,29 @@
 
   .btn-primary {
     @apply px-6 py-3 text-white font-semibold rounded-xl transition-all duration-200 transform hover:scale-105;
-    background: linear-gradient(135deg, #1e40af, #3b82f6);
+    background: #1e40af;
     box-shadow: 0 4px 15px rgba(30, 64, 175, 0.4);
   }
 
   .btn-primary:hover {
-    background: linear-gradient(135deg, #3b82f6, #60a5fa);
+    background: #3b82f6;
     box-shadow: 0 6px 20px rgba(30, 64, 175, 0.6);
   }
 
   .btn-secondary {
     @apply px-6 py-3 text-white font-semibold rounded-xl transition-all duration-200 transform hover:scale-105;
-    background: linear-gradient(135deg, #1e3a8a, #1e40af);
+    background: #1e3a8a;
     box-shadow: 0 4px 15px rgba(30, 58, 138, 0.4);
   }
 
   .btn-secondary:hover {
-    background: linear-gradient(135deg, #1e40af, #3b82f6);
+    background: #1e40af;
     box-shadow: 0 6px 20px rgba(30, 58, 138, 0.6);
   }
 
   .score-card {
     @apply p-4 rounded-xl border transition-all duration-200;
-    background: linear-gradient(135deg, #fef3c7, #fde68a);
+    background: #fef3c7;
     border-color: #fbbf24;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
   }
@@ -254,7 +257,56 @@
   .score-card:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-    background: linear-gradient(135deg, #fde68a, #fcd34d);
+    background: #fde68a;
+  }
+
+  /* Medal background gradients for monthly rankings */
+  .score-card.medal-gold {
+    background: linear-gradient(135deg, #fde68a 0%, #fbbf24 100%);
+    border-color: #f59e0b;
+    color: #92400e;
+  }
+
+  .score-card.medal-gold:hover {
+    background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 20px rgba(217, 119, 6, 0.3);
+  }
+
+  .score-card.medal-silver {
+    background: linear-gradient(135deg, #9ca3af 0%, #6b7280 100%);
+    border-color: #4b5563;
+    color: #374151;
+  }
+
+  .score-card.medal-silver:hover {
+    background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 20px rgba(75, 85, 99, 0.3);
+  }
+
+  .score-card.medal-bronze {
+    background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
+    border-color: #92400e;
+    color: #78350f;
+  }
+
+  .score-card.medal-bronze:hover {
+    background: linear-gradient(135deg, #b45309 0%, #92400e 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 20px rgba(146, 64, 14, 0.3);
+  }
+
+  .score-card.medal-regular {
+    background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+    border-color: #d1d5db;
+    color: #374151;
+  }
+
+  .score-card.medal-regular:hover {
+    background: linear-gradient(135deg, #e5e7eb 0%, #d1d5db 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 20px rgba(209, 213, 219, 0.3);
   }
 
   .tab-button {
@@ -271,7 +323,7 @@
 
   .input-field {
     @apply w-full px-4 py-3 border border-blue-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200;
-    background: linear-gradient(145deg, #ffffff, #eff6ff);
+    background: #ffffff;
   }
 
   .input-field:focus {
@@ -281,36 +333,36 @@
 
   .message-success {
     @apply p-3 text-emerald-800 rounded-xl border;
-    background: linear-gradient(135deg, #d1fae5, #a7f3d0);
+    background: #d1fae5;
     border-color: #10b981;
   }
 
   .message-error {
     @apply p-3 text-red-800 rounded-xl border;
-    background: linear-gradient(135deg, #fee2e2, #fecaca);
+    background: #fee2e2;
     border-color: #ef4444;
   }
 
   .message-info {
     @apply p-3 text-blue-800 rounded-xl border;
-    background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+    background: #dbeafe;
     border-color: #3b82f6;
   }
 
   .rank-badge {
     @apply inline-flex items-center justify-center w-8 h-8 text-sm font-bold text-white rounded-full;
-    background: linear-gradient(145deg, #1e40af, #3b82f6);
+    background: #1e40af;
   }
 
   .rank-badge.gold {
-    background: linear-gradient(145deg, #fbbf24, #f59e0b);
+    background: #fbbf24;
   }
 
   .rank-badge.silver {
-    background: linear-gradient(145deg, #9ca3af, #6b7280);
+    background: #9ca3af;
   }
 
   .rank-badge.bronze {
-    background: linear-gradient(145deg, #d97706, #b45309);
+    background: #d97706;
   }
 }

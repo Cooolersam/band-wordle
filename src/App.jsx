@@ -1,14 +1,25 @@
 import { useState, useEffect } from 'react'
+import Welcome from './components/Welcome'
 import WordleBoard from './components/WordleBoard'
 import Leaderboard from './components/Leaderboard'
 import AdminPanel from './components/AdminPanel'
 import PasswordScreen from './components/PasswordScreen'
 
 function App() {
-  const [currentView, setCurrentView] = useState('game')
+  const [currentView, setCurrentView] = useState('welcome')
   const [gameResult, setGameResult] = useState(null)
   const [adminMode, setAdminMode] = useState(false)
   const [showPasswordScreen, setShowPasswordScreen] = useState(false)
+  const [playerInfo, setPlayerInfo] = useState(null)
+
+  // Check if player has already completed welcome screen
+  useEffect(() => {
+    const storedPlayer = localStorage.getItem('bandWordlePlayer')
+    if (storedPlayer) {
+      setPlayerInfo(JSON.parse(storedPlayer))
+      setCurrentView('game')
+    }
+  }, [])
 
   // Hidden admin access: Press Ctrl+Shift+A to access admin panel
   useEffect(() => {
@@ -22,6 +33,22 @@ function App() {
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [])
+
+  const handleStartGame = () => {
+    // Get player info from localStorage
+    const storedPlayer = localStorage.getItem('bandWordlePlayer')
+    if (storedPlayer) {
+      const player = JSON.parse(storedPlayer)
+      // Handle custom instrument display
+      if (player.instrument === 'Other' && player.customInstrument) {
+        player.displayInstrument = player.customInstrument
+      } else {
+        player.displayInstrument = player.instrument
+      }
+      setPlayerInfo(player)
+    }
+    setCurrentView('game')
+  }
 
   const handleGameComplete = (won, guesses) => {
     setGameResult({ won, guesses })
@@ -50,20 +77,22 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-blue-50 font-body">
       {showPasswordScreen ? (
         <PasswordScreen 
           onPasswordCorrect={handlePasswordCorrect}
           onCancel={handlePasswordCancel}
         />
+      ) : currentView === 'welcome' ? (
+        <Welcome onStartGame={handleStartGame} />
       ) : currentView === 'game' ? (
         <WordleBoard 
+          playerInfo={playerInfo}
           onGameComplete={handleGameComplete}
           onShowLeaderboard={handleShowLeaderboard}
         />
       ) : currentView === 'leaderboard' ? (
         <Leaderboard 
-          gameResult={gameResult}
           onBackToGame={handleBackToGame}
         />
       ) : currentView === 'admin' ? (

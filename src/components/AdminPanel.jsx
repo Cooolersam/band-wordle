@@ -60,103 +60,109 @@ const AdminPanel = ({ onBackToGame }) => {
     return matchesDate && matchesNickname
   })
 
-  const renderWordSchedule = () => (
-    <div className="space-y-6">
-      <div className="bg-blue-50 border border-blue-200 rounded-xl p-6">
-        <h3 className="text-xl font-bold text-blue-800 mb-4">Word Schedule Information</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div>
-            <h4 className="font-semibold text-blue-700 mb-2">Current Status</h4>
-            <ul className="space-y-1 text-sm text-blue-600">
-              <li>• Start Date: August 28, 2025</li>
-              <li>• Current Word List: 30 words</li>
-              <li>• List ends: After ANTHEM (September 27)</li>
-              <li>• Next words needed: Starting September 28</li>
-            </ul>
-          </div>
-          <div>
-            <h4 className="font-semibold text-blue-700 mb-2">Word Categories</h4>
-            <ul className="space-y-1 text-sm text-blue-600">
-              <li>• Instruments: GUITAR, GIBSON, PIANO</li>
-              <li>• Music Terms: RHYTHM, MELODY, BRIDGE</li>
-              <li>• Genres: REGGAE, TECHNO, COUNTRY</li>
-              <li>• Band Related: STAGE, STUDIO, ANTHEM</li>
-            </ul>
-          </div>
-        </div>
-      </div>
+  const renderWordSchedule = () => {
+    // Calculate dates for each word based on the actual list
+    const startDate = new Date('2025-08-28')
+    const wordList = [
+      'MUSIEL', 'GUITAR', 'GIBSON', 'BALLET', 'STAFFS', 'TREBLE', 'CHORUS', 'LEGATO',
+      'RHYTHM', 'MELODY', 'BRIDGE', 'ACCENT', 'OCTAVE', 'ENCORE', 'PHRASE', 'MANUAL', 'FUSSEL',
+      'REGGAE', 'TECHNO', 'COUNTRY', 'OPERA', 'BALLET', 'FLUTES',
+      'SONATA', 'TUNING', 'UNISON', 'VOLUME', 'DECAPO', 'STUDIO', 'BALLAD', 'ANTHEM'
+    ]
+    
+    const wordDates = wordList.map((word, index) => {
+      const date = new Date(startDate)
+      date.setDate(startDate.getDate() + index)
+      return {
+        word,
+        date: date.toLocaleDateString('en-US', { 
+          weekday: 'long', 
+          year: 'numeric', 
+          month: 'long', 
+          day: 'numeric' 
+        }),
+        shortDate: date.toLocaleDateString('en-US', { 
+          month: 'short', 
+          day: 'numeric' 
+        })
+      }
+    })
 
-      <div className="bg-amber-50 border border-amber-200 rounded-xl p-6">
-        <h4 className="font-semibold text-amber-800 mb-3">Quick Reference</h4>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-          <div>
-            <span className="font-medium text-amber-700">1st of month:</span><br/>
-            <span className="text-amber-600">Usually STAFFS, BALLET, or GIBSON</span>
-          </div>
-          <div>
-            <span className="font-medium text-amber-700">15th of month:</span><br/>
-            <span className="text-amber-600">Usually REGGAE, TECHNO, or COUNTRY</span>
-          </div>
-          <div>
-            <span className="font-medium text-amber-700">28th of month:</span><br/>
-            <span className="text-amber-600">Usually ANTHEM, BALLAD, or STUDIO</span>
-          </div>
-          <div>
-            <span className="font-medium text-amber-700">End of month:</span><br/>
-            <span className="text-amber-600">Usually GIBSON, GUITAR, or MUSIEL</span>
+    return (
+      <div className="space-y-6">
+        <div className="bg-blue-50 border border-blue-200 rounded-xl p-6">
+          <h3 className="text-xl font-bold text-blue-800 mb-4 font-display">Word Schedule</h3>
+          <p className="text-sm text-blue-600 mb-4 font-body">
+            Start Date: August 28, 2025 | Total Words: {wordList.length}
+          </p>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {wordDates.map((item, index) => (
+              <div key={index} className="bg-white p-3 rounded-lg border border-blue-200">
+                <div className="font-bold text-blue-900 text-lg font-body">{item.word}</div>
+                <div className="text-sm text-blue-600 font-body">{item.shortDate}</div>
+                <div className="text-xs text-blue-500 font-body">{item.date}</div>
+              </div>
+            ))}
           </div>
         </div>
-      </div>
 
-      <div className="bg-green-50 border border-green-200 rounded-xl p-6">
-        <h4 className="font-semibold text-green-800 mb-3">Adding New Words</h4>
-        <p className="text-sm text-green-700 mb-3">
-          When you add new words to wordList.js, update this schedule accordingly.
-        </p>
-        <div className="text-xs text-green-600 space-y-1">
-          <p>• Words should be exactly 6 letters long</p>
-          <p>• All uppercase in the code</p>
-          <p>• Music/band related</p>
-          <p>• Update this admin panel when adding new words</p>
+        <div className="bg-amber-50 border border-amber-200 rounded-xl p-6">
+          <h4 className="font-semibold text-amber-800 mb-3 font-body">Current Status</h4>
+          <div className="text-sm text-amber-600 font-body space-y-1">
+            <p>• Start Date: August 28, 2025</p>
+            <p>• Current Word List: {wordList.length} words</p>
+            <p>• List ends: {wordDates[wordDates.length - 1]?.date}</p>
+            <p>• Next words needed: Starting {new Date(new Date(wordDates[wordDates.length - 1]?.date).getTime() + 24*60*60*1000).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</p>
+          </div>
         </div>
       </div>
-    </div>
-  )
+    )
+  }
 
   return (
     <div className="min-h-screen p-6">
       <div className="max-w-6xl mx-auto p-8 bg-white rounded-2xl shadow-xl">
         <div className="flex justify-between items-center mb-8">
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-900 to-slate-900 bg-clip-text text-transparent">
+          <h1 className="text-4xl font-bold text-blue-900 font-display">
             Admin Panel
           </h1>
           <button
             onClick={onBackToGame}
-            className="btn-secondary"
+            className="btn-secondary font-body"
           >
             ← Back to Game
           </button>
         </div>
 
         {message && (
-          <div className={`mb-6 p-4 rounded-xl ${
+          <div className={`mb-6 p-4 rounded-xl font-body ${
             message.includes('Error') ? 'bg-red-50 text-red-800 border border-red-200' : 'bg-green-50 text-green-800 border border-green-200'
           }`}>
             {message}
           </div>
         )}
 
+        {/* Duplicate Prevention Info */}
+        <div className="mb-6 p-4 bg-blue-50 rounded-xl border border-blue-200">
+          <h3 className="font-semibold text-blue-800 mb-2 font-body">Duplicate Prevention Active</h3>
+          <p className="text-sm text-blue-600 font-body">
+            The system now prevents duplicate submissions for the same person on the same day. 
+            If someone tries to submit multiple times, only their best score (lowest guesses) is kept.
+          </p>
+        </div>
+
         {/* Tab Navigation */}
         <div className="flex border-b border-gray-200 mb-8">
           <button
             onClick={() => setActiveTab('scores')}
-            className={`tab-button ${activeTab === 'scores' ? 'active' : 'inactive'}`}
+            className={`tab-button font-body ${activeTab === 'scores' ? 'active' : 'inactive'}`}
           >
             Scores Management
           </button>
           <button
             onClick={() => setActiveTab('schedule')}
-            className={`tab-button ${activeTab === 'schedule' ? 'active' : 'inactive'}`}
+            className={`tab-button font-body ${activeTab === 'schedule' ? 'active' : 'inactive'}`}
           >
             Word Schedule
           </button>

@@ -79,9 +79,18 @@ export const dbOperations = {
         return acc
       }, {})
 
-      // Convert to array and sort by total guesses
+      console.log('Monthly leaderboard grouping example:', Object.keys(groupedData).slice(0, 3))
+
+      // Convert to array and sort by games played first, then by total guesses
       const sortedData = Object.values(groupedData)
-        .sort((a, b) => a.totalGuesses - b.totalGuesses)
+        .sort((a, b) => {
+          // First priority: more games played (descending)
+          if (b.gamesPlayed !== a.gamesPlayed) {
+            return b.gamesPlayed - a.gamesPlayed
+          }
+          // Second priority: fewer total guesses (ascending) - tiebreaker
+          return a.totalGuesses - b.totalGuesses
+        })
         .slice(0, 20)
 
       return { data: sortedData, error: null }
@@ -92,12 +101,13 @@ export const dbOperations = {
   },
 
   // Check if user already submitted today
-  async hasSubmittedToday(nickname, date) {
+  async hasSubmittedToday(nickname, section, date) {
     try {
       const { data, error } = await supabase
         .from('scores')
         .select('id')
         .eq('nickname', nickname)
+        .eq('section', section)
         .eq('date', date)
         .limit(1)
 

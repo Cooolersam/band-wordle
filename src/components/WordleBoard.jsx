@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react'
 import { getWordOfTheDay, isValidWord, WORD_LENGTH } from '../wordList'
+import { dbOperations } from '../supabaseClient'
 
-const WordleBoard = ({ onGameComplete, onShowLeaderboard }) => {
+const WordleBoard = ({ playerInfo, onGameComplete, onShowLeaderboard }) => {
   // Game configuration constants
   const MAX_GUESSES = 6
   
@@ -13,10 +14,58 @@ const WordleBoard = ({ onGameComplete, onShowLeaderboard }) => {
   const [message, setMessage] = useState('')
   const [keyStates, setKeyStates] = useState({})
   const [isProcessing, setIsProcessing] = useState(false)
+  const [winningRowIndex, setWinningRowIndex] = useState(null)
+  const [scoreSubmitted, setScoreSubmitted] = useState(false)
+
+  // Submit score to database
+  const submitScore = async (won, guesses) => {
+    if (!playerInfo?.name || !playerInfo?.instrument || scoreSubmitted) return
+    
+    try {
+      const today = new Date().toISOString().split('T')[0]
+      
+      // Check if user already submitted today with same name AND instrument
+      const { hasSubmitted, error: checkError } = await dbOperations.hasSubmittedToday(
+        playerInfo.name.trim(),
+        playerInfo.instrument.trim(),
+        today
+      )
+
+      if (checkError) {
+        console.error('Error checking submission:', checkError)
+        return
+      }
+
+      if (hasSubmitted) {
+        console.log('Score already submitted for today')
+        return
+      }
+
+      // Submit score
+      const { error: submitError } = await dbOperations.submitScore(
+        playerInfo.name.trim(),
+        playerInfo.instrument.trim(),
+        guesses,
+        won,
+        today
+      )
+
+      if (submitError) {
+        console.error('Error submitting score:', submitError)
+      } else {
+        setScoreSubmitted(true)
+        console.log('Score submitted successfully!')
+      }
+    } catch (error) {
+      console.error('Error submitting score:', error)
+    }
+  }
 
   // Check if a letter is in the correct position
   const isCorrectPosition = (letter, index) => {
-    return wordOfTheDay[index] === letter
+    const isCorrect = wordOfTheDay[index] === letter
+
+    return isCorrect
   }
 
   // Check if a letter exists in the word but wrong position
@@ -108,7 +157,7 @@ const WordleBoard = ({ onGameComplete, onShowLeaderboard }) => {
     const currentGuess = guesses[currentGuessIndex]
     const currentGuessString = currentGuess.join('')
     
-    console.log('Submitting guess:', currentGuessString)
+
     
     if (currentGuessString.length !== WORD_LENGTH) {
       setMessage(`Word must be ${WORD_LENGTH} letters long`)
@@ -122,7 +171,7 @@ const WordleBoard = ({ onGameComplete, onShowLeaderboard }) => {
     
     // Validate the word
     const isValid = isValidWord(currentGuessString, wordOfTheDay)
-    console.log('Word validation result:', isValid, 'for word:', currentGuessString)
+
     
     // Add a small delay to simulate processing and show feedback
     setTimeout(() => {
@@ -142,19 +191,19 @@ const WordleBoard = ({ onGameComplete, onShowLeaderboard }) => {
 
       // Check if won
       if (currentGuessString === wordOfTheDay) {
+        console.log('🎉 WINNING! Setting winning row index to:', currentGuessIndex)
         setGameWon(true)
         setGameComplete(true)
+        setWinningRowIndex(currentGuessIndex)
         onGameComplete(true, currentGuessIndex + 1)
-        
-        // Add celebration effect to the winning row
-        const winningRow = document.querySelector(`[data-guess="${currentGuessIndex}"]`)
-        if (winningRow) {
-          winningRow.classList.add('winning-row')
-        }
+        // Submit score for win
+        submitScore(true, currentGuessIndex + 1)
       } else if (currentGuessIndex === MAX_GUESSES - 1) {
         // Game over
         setGameComplete(true)
         onGameComplete(false, MAX_GUESSES)
+        // Submit score for loss
+        submitScore(false, MAX_GUESSES)
       } else {
         // Move to next guess
         setCurrentGuessIndex(currentGuessIndex + 1)
@@ -172,6 +221,18 @@ const WordleBoard = ({ onGameComplete, onShowLeaderboard }) => {
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [guesses, currentGuessIndex])
 
+  // Reset winning row index when game state changes
+  useEffect(() => {
+    if (!gameComplete) {
+      setWinningRowIndex(null)
+    }
+  }, [gameComplete])
+
+  // Debug winning row index changes
+  useEffect(() => {
+    console.log('🔄 Winning row index changed to:', winningRowIndex)
+  }, [winningRowIndex])
+
   // Handle grid click to focus input and show keyboard
   const handleGridClick = () => {
     // Focus the hidden input to bring up the keyboard
@@ -183,30 +244,29 @@ const WordleBoard = ({ onGameComplete, onShowLeaderboard }) => {
 
   // Render a single tile
   const renderTile = (letter, index, guessIndex) => {
-    // Show uncolored tiles for future guesses and current input row
-    if (guessIndex >= currentGuessIndex) {
-      return (
-        <div key={index} className="wordle-tile">
-          {letter || ''}
-        </div>
-      )
-    }
-
     let tileClass = 'wordle-tile'
-    let animationStyle = {}
     
-    if (isCorrectPosition(letter, index)) {
+    // If this is the winning row, always show correct styling
+    if (guessIndex === winningRowIndex) {
       tileClass += ' correct'
-      // Add staggered animation delay for each tile
-      animationStyle = { animationDelay: `${index * 0.1}s` }
-    } else if (isPresent(letter, index)) {
-      tileClass += ' present'
-    } else {
-      tileClass += ' absent'
+    }
+    // Show uncolored tiles for future guesses and current input row
+    else if (guessIndex >= currentGuessIndex) {
+      // No additional classes needed
+    }
+    // Apply normal game logic for completed guesses
+    else {
+      if (isCorrectPosition(letter, index)) {
+        tileClass += ' correct'
+      } else if (isPresent(letter, index)) {
+        tileClass += ' present'
+      } else {
+        tileClass += ' absent'
+      }
     }
 
     return (
-      <div key={index} className={tileClass} style={animationStyle}>
+      <div key={index} className={tileClass}>
         {letter}
       </div>
     )
@@ -266,19 +326,42 @@ const WordleBoard = ({ onGameComplete, onShowLeaderboard }) => {
   return (
     <div className="min-h-screen p-2 sm:p-6">
       <div className="game-container max-w-lg mx-auto p-4 sm:p-8">
-        <h1 className="text-3xl sm:text-4xl font-bold text-center mb-6 sm:mb-8 bg-gradient-to-r from-blue-900 to-slate-900 bg-clip-text text-transparent">
-          Band Wordle
+        <h1 className="text-3xl sm:text-4xl font-bold text-center mb-4 sm:mb-6 text-blue-900 font-display">
+          🎵 Band Wordle 🎵
         </h1>
+        
+        {/* Player Info */}
+        <div className="text-center mb-6 sm:mb-8">
+          <div className="inline-flex items-center space-x-3 bg-white rounded-full px-4 py-2 shadow-md border border-gray-200">
+            <span className="text-sm text-gray-600 font-body">
+              Playing as: <span className="font-semibold text-gray-800">{playerInfo?.name || 'Unknown'}</span>
+            </span>
+            <span className="text-gray-400">•</span>
+            <span className="text-sm text-gray-600 font-body">
+              <span className="font-semibold text-gray-800">{playerInfo?.instrument || 'Unknown'}</span>
+            </span>
+            <button
+              onClick={() => {
+                localStorage.removeItem('bandWordlePlayer')
+                window.location.reload()
+              }}
+              className="ml-2 text-xs text-blue-600 hover:text-blue-800 underline font-body"
+              title="Change player info"
+            >
+              Change
+            </button>
+          </div>
+        </div>
         
         {/* Mobile instructions */}
         <div className="sm:hidden text-center mb-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
-          <p className="text-blue-800 text-sm">
+          <p className="text-blue-800 text-sm font-body">
             <strong>Tap anywhere on the game board to start typing</strong>
           </p>
         </div>
         
         {message && (
-          <div className={`text-center mb-4 sm:mb-6 p-3 sm:p-4 rounded-xl ${
+          <div className={`text-center mb-4 sm:mb-6 p-3 sm:p-4 rounded-xl font-body ${
             isProcessing 
               ? 'message-info' 
               : 'message-error'
@@ -304,7 +387,12 @@ const WordleBoard = ({ onGameComplete, onShowLeaderboard }) => {
           onClick={handleGridClick}
         >
           {guesses.map((guess, guessIndex) => (
-            <div key={guessIndex} className="flex justify-center space-x-1 sm:space-x-2" data-guess={guessIndex}>
+            <div 
+              key={guessIndex} 
+              className={`flex justify-center space-x-1 sm:space-x-2 ${guessIndex === winningRowIndex ? 'winning-row' : ''}`} 
+              data-guess={guessIndex}
+              data-winning={guessIndex === winningRowIndex ? 'true' : 'false'}
+            >
               {Array.from({ length: WORD_LENGTH }, (_, index) => 
                 renderTile(guess[index] || '', index, guessIndex)
               )}
@@ -314,11 +402,11 @@ const WordleBoard = ({ onGameComplete, onShowLeaderboard }) => {
 
         {/* Game Complete Message */}
         {gameComplete && (
-          <div className="text-center mb-6 sm:mb-8 p-4 sm:p-6 bg-gradient-to-r from-amber-50 to-orange-50 rounded-xl sm:rounded-2xl border border-amber-200">
-            <h2 className="text-xl sm:text-2xl font-bold mb-2 sm:mb-3">
+          <div className="text-center mb-6 sm:mb-8 p-4 sm:p-6 bg-amber-50 rounded-xl sm:rounded-2xl border border-amber-200">
+            <h2 className="text-xl sm:text-2xl font-bold mb-2 sm:mb-3 font-display">
               {gameWon ? 'Congratulations!' : 'Game Over'}
             </h2>
-            <p className="mb-4 sm:mb-6 text-gray-700 text-sm sm:text-base">
+            <p className="mb-4 sm:mb-6 text-gray-700 text-sm sm:text-base font-body">
               {gameWon 
                 ? `You solved it in ${currentGuessIndex + 1} ${currentGuessIndex === 0 ? 'guess' : 'guesses'}!`
                 : `The word was: ${wordOfTheDay}`
@@ -327,7 +415,7 @@ const WordleBoard = ({ onGameComplete, onShowLeaderboard }) => {
             <div className="space-x-2 sm:space-x-3">
               <button
                 onClick={() => onShowLeaderboard()}
-                className="btn-primary"
+                className="btn-primary font-body"
               >
                 View Leaderboard
               </button>

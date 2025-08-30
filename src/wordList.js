@@ -1,5 +1,5 @@
 // We'll use a comprehensive English word list instead of the problematic check-word library
-import { sixLetterWords } from './sixLetterWords.js'
+import { sixLetterWords } from './completeSixLetterWords.js'
 
 // Game configuration constant
 export const WORD_LENGTH = 6
@@ -8,7 +8,7 @@ export const WORD_LENGTH = 6
 export const wordList = [
   'MUSIEL', 'GUITAR', 'GIBSON', 'BALLET', 'STAFFS', 'TREBLE', 'CHORUS', 'LEGATO',
   'RHYTHM', 'MELODY', 'BRIDGE', 'ACCENT', 'OCTAVE', 'ENCORE', 'PHRASE', 'MANUAL', 'FUSSEL',
-  'REGGAE', 'TECHNO', 'COUNTRY', 'OPERA', 'BALLET', 'CLASSICAL',
+  'REGGAE', 'TECHNO', 'COUNTRY', 'OPERA', 'BALLET', 'FLUTES',
   'SONATA', 'TUNING', 'UNISON', 'VOLUME', 'DECAPO', 'STUDIO', 'BALLAD', 'ANTHEM'
 ];
 
@@ -37,6 +37,7 @@ export function isValidWord(word, answer = null) {
     return true;
   }
   
-  // Check if the word exists in our curated list of common 6-letter words
+  // Check if the word exists in our comprehensive list of 6-letter words
+  // This allows more niche/obscure words to be accepted
   return sixLetterWords.includes(word.toLowerCase());
 } 
