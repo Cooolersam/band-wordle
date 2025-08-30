@@ -1,13 +1,41 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { dbOperations } from '../supabaseClient'
 
 const Leaderboard = ({ onBackToGame }) => {
   const [dailyLeaderboard, setDailyLeaderboard] = useState([])
   const [monthlyLeaderboard, setMonthlyLeaderboard] = useState([])
+  const [loading, setLoading] = useState(true)
   const [activeTab, setActiveTab] = useState('daily')
 
+  useEffect(() => {
+    loadLeaderboards()
+  }, [])
 
+  const loadLeaderboards = async () => {
+    setLoading(true)
+    try {
+      const [dailyResult, monthlyResult] = await Promise.all([
+        dbOperations.getDailyLeaderboard(),
+        dbOperations.getMonthlyLeaderboard()
+      ])
 
+      if (dailyResult.error) {
+        console.error('Error loading daily leaderboard:', dailyResult.error)
+      } else {
+        setDailyLeaderboard(dailyResult.data || [])
+      }
 
+      if (monthlyResult.error) {
+        console.error('Error loading monthly leaderboard:', monthlyResult.error)
+      } else {
+        setMonthlyLeaderboard(monthlyResult.data || [])
+      }
+    } catch (error) {
+      console.error('Error loading leaderboards:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
 
 
 
@@ -92,12 +120,21 @@ const Leaderboard = ({ onBackToGame }) => {
           <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-900 to-slate-900 bg-clip-text text-transparent">
             Leaderboard
           </h1>
-          <button
-            onClick={onBackToGame}
-            className="btn-secondary"
-          >
-            ← Back to Game
-          </button>
+          <div className="flex space-x-3">
+            <button
+              onClick={loadLeaderboards}
+              className="btn-secondary"
+              disabled={loading}
+            >
+              {loading ? 'Loading...' : '🔄 Refresh'}
+            </button>
+            <button
+              onClick={onBackToGame}
+              className="btn-secondary"
+            >
+              ← Back to Game
+            </button>
+          </div>
         </div>
 
 
@@ -121,9 +158,16 @@ const Leaderboard = ({ onBackToGame }) => {
         </div>
 
         {/* Leaderboard Content */}
-        <div>
-          {activeTab === 'daily' ? renderDailyLeaderboard() : renderMonthlyLeaderboard()}
-        </div>
+        {loading ? (
+          <div className="text-center py-12">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto"></div>
+            <p className="mt-4 text-gray-600 text-lg">Loading leaderboards...</p>
+          </div>
+        ) : (
+          <div>
+            {activeTab === 'daily' ? renderDailyLeaderboard() : renderMonthlyLeaderboard()}
+          </div>
+        )}
       </div>
     </div>
   )
